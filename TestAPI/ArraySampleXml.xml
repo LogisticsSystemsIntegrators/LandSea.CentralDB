@@ -1,0 +1,4 @@
+<ArrayOfBookingBindingRequest>
+<BookingBindingRequest><TruckIn><testing>Hello</testing><SomeVlaue>testing</SomeVlaue></TruckIn><bookingtype>broadcast</bookingtype><ShipmentInfo><bidAMount>0</bidAMount></ShipmentInfo>
+</BookingBindingRequest>
+</ArrayOfBookingBindingRequest>
