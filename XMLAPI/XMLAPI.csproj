@@ -146,6 +146,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Objects\CargoWiseXML.cs" />
+    <Compile Include="Objects\ObjectTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\FailedReponseMessage.cs" />
   </ItemGroup>
@@ -172,7 +174,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Objects\" />
     <Folder Include="Views\Authentication\" />
   </ItemGroup>
   <ItemGroup>

@@ -10,8 +10,13 @@
 ** PR   Date				Description 
 ** --   --------			------------------------------------
 ** 1	2020-09-03			Creation
+** 2	2020-09-25			Add XML Type (Shipment/Organisation), Search Value parameters
 *******************************/
 CREATE PROCEDURE [CargoWiseFileProcess]
+(
+	@XMLType VARCHAR(20),
+	@KeyValue VARCHAR(50) = NULL
+)
 WITH ENCRYPTION
 AS
 BEGIN
@@ -19,11 +24,16 @@ BEGIN
 
 	SELECT		TOP 1 @FileContextID = [ID]
 	FROM		[CargoWiseFile]
-	WHERE		[SAPProcessed] = 0;
+	WHERE		[SAPProcessed] = 0
+	AND			[LandseaProcessed] = 0
+	AND			[XMLType] = @XMLType
+	AND			(@KeyValue IS NULL OR [Key] = @KeyValue)
+	ORDER BY	[CreatedDate] ASC;
 
 	IF @FileContextID IS NOT NULL
 	BEGIN
-		SELECT		[FileContext]
+		SELECT		[ID] AS [MessageID],
+					[FileContext] AS [Message]
 		FROM		[CargoWiseFile]
 		WHERE		[ID] = @FileContextID;
 
