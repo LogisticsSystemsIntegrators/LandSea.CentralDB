@@ -15,7 +15,7 @@
 CREATE PROCEDURE [CargoWiseFileProcess]
 (
 	@XMLType VARCHAR(20),
-	@KeyValue VARCHAR(50)
+	@KeyValue VARCHAR(50) = NULL
 )
 WITH ENCRYPTION
 AS
@@ -27,12 +27,13 @@ BEGIN
 	WHERE		[SAPProcessed] = 0
 	AND			[LandseaProcessed] = 0
 	AND			[XMLType] = @XMLType
-	AND			[Key] = @KeyValue;
+	AND			(@KeyValue IS NULL OR [Key] = @KeyValue)
+	ORDER BY	[CreatedDate] ASC;
 
 	IF @FileContextID IS NOT NULL
 	BEGIN
-		SELECT		[ID],
-					[FileContext]
+		SELECT		[ID] AS [MessageID],
+					[FileContext] AS [Message]
 		FROM		[CargoWiseFile]
 		WHERE		[ID] = @FileContextID;
 

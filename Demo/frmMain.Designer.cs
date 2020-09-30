@@ -29,29 +29,33 @@
         private void InitializeComponent()
         {
             this.gbxAuthentication = new System.Windows.Forms.GroupBox();
-            this.gbxSendXML = new System.Windows.Forms.GroupBox();
-            this.gbxGetXML = new System.Windows.Forms.GroupBox();
-            this.btnAuthenticate = new System.Windows.Forms.Button();
-            this.lblResponse = new System.Windows.Forms.Label();
-            this.lblResponseResult = new System.Windows.Forms.Label();
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.lblPassword = new System.Windows.Forms.Label();
-            this.txtUsername = new System.Windows.Forms.TextBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
-            this.ofdSelectXML = new System.Windows.Forms.OpenFileDialog();
-            this.btnSelectXML = new System.Windows.Forms.Button();
-            this.btnSendXML = new System.Windows.Forms.Button();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.lblUsername = new System.Windows.Forms.Label();
+            this.lblResponseResult = new System.Windows.Forms.Label();
+            this.lblResponse = new System.Windows.Forms.Label();
+            this.btnAuthenticate = new System.Windows.Forms.Button();
+            this.gbxSendXML = new System.Windows.Forms.GroupBox();
             this.txtSendXMLPath = new System.Windows.Forms.TextBox();
-            this.radOrganization = new System.Windows.Forms.RadioButton();
-            this.radShipment = new System.Windows.Forms.RadioButton();
-            this.lblKey = new System.Windows.Forms.Label();
-            this.btnGetXML = new System.Windows.Forms.Button();
-            this.txtMessageKey = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnSendXML = new System.Windows.Forms.Button();
+            this.btnSelectXML = new System.Windows.Forms.Button();
+            this.gbxGetXML = new System.Windows.Forms.GroupBox();
             this.rtxXMLMessageResult = new System.Windows.Forms.RichTextBox();
+            this.txtMessageKey = new System.Windows.Forms.TextBox();
+            this.btnGetXML = new System.Windows.Forms.Button();
+            this.lblKey = new System.Windows.Forms.Label();
+            this.radShipment = new System.Windows.Forms.RadioButton();
+            this.radOrganization = new System.Windows.Forms.RadioButton();
+            this.ofdSelectXML = new System.Windows.Forms.OpenFileDialog();
+            this.gbxMarkAsProcessed = new System.Windows.Forms.GroupBox();
+            this.txtProcessedMessageID = new System.Windows.Forms.TextBox();
+            this.lblMarkAsProcessedMessageID = new System.Windows.Forms.Label();
+            this.btnMarkAsProcessed = new System.Windows.Forms.Button();
             this.gbxAuthentication.SuspendLayout();
             this.gbxSendXML.SuspendLayout();
             this.gbxGetXML.SuspendLayout();
+            this.gbxMarkAsProcessed.SuspendLayout();
             this.SuspendLayout();
             // 
             // gbxAuthentication
@@ -70,6 +74,66 @@
             this.gbxAuthentication.TabStop = false;
             this.gbxAuthentication.Text = "Authentication";
             // 
+            // txtPassword
+            // 
+            this.txtPassword.Location = new System.Drawing.Point(294, 23);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(137, 20);
+            this.txtPassword.TabIndex = 6;
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.Location = new System.Drawing.Point(70, 23);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(137, 20);
+            this.txtUsername.TabIndex = 5;
+            // 
+            // lblPassword
+            // 
+            this.lblPassword.AutoSize = true;
+            this.lblPassword.Location = new System.Drawing.Point(232, 26);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(56, 13);
+            this.lblPassword.TabIndex = 4;
+            this.lblPassword.Text = "Password:";
+            // 
+            // lblUsername
+            // 
+            this.lblUsername.AutoSize = true;
+            this.lblUsername.Location = new System.Drawing.Point(6, 26);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(58, 13);
+            this.lblUsername.TabIndex = 3;
+            this.lblUsername.Text = "Username:";
+            // 
+            // lblResponseResult
+            // 
+            this.lblResponseResult.AutoSize = true;
+            this.lblResponseResult.Location = new System.Drawing.Point(181, 62);
+            this.lblResponseResult.Name = "lblResponseResult";
+            this.lblResponseResult.Size = new System.Drawing.Size(125, 13);
+            this.lblResponseResult.TabIndex = 2;
+            this.lblResponseResult.Text = "Press button to get value";
+            // 
+            // lblResponse
+            // 
+            this.lblResponse.AutoSize = true;
+            this.lblResponse.Location = new System.Drawing.Point(117, 62);
+            this.lblResponse.Name = "lblResponse";
+            this.lblResponse.Size = new System.Drawing.Size(58, 13);
+            this.lblResponse.TabIndex = 1;
+            this.lblResponse.Text = "Response:";
+            // 
+            // btnAuthenticate
+            // 
+            this.btnAuthenticate.Location = new System.Drawing.Point(6, 57);
+            this.btnAuthenticate.Name = "btnAuthenticate";
+            this.btnAuthenticate.Size = new System.Drawing.Size(75, 23);
+            this.btnAuthenticate.TabIndex = 0;
+            this.btnAuthenticate.Text = "Authenticate";
+            this.btnAuthenticate.UseVisualStyleBackColor = true;
+            this.btnAuthenticate.Click += new System.EventHandler(this.btnAuthenticate_Click);
+            // 
             // gbxSendXML
             // 
             this.gbxSendXML.Controls.Add(this.txtSendXMLPath);
@@ -81,6 +145,33 @@
             this.gbxSendXML.TabIndex = 1;
             this.gbxSendXML.TabStop = false;
             this.gbxSendXML.Text = "Send XML";
+            // 
+            // txtSendXMLPath
+            // 
+            this.txtSendXMLPath.Location = new System.Drawing.Point(87, 30);
+            this.txtSendXMLPath.Name = "txtSendXMLPath";
+            this.txtSendXMLPath.Size = new System.Drawing.Size(683, 20);
+            this.txtSendXMLPath.TabIndex = 6;
+            // 
+            // btnSendXML
+            // 
+            this.btnSendXML.Location = new System.Drawing.Point(6, 71);
+            this.btnSendXML.Name = "btnSendXML";
+            this.btnSendXML.Size = new System.Drawing.Size(75, 23);
+            this.btnSendXML.TabIndex = 2;
+            this.btnSendXML.Text = "Send XML";
+            this.btnSendXML.UseVisualStyleBackColor = true;
+            this.btnSendXML.Click += new System.EventHandler(this.btnSendXML_Click);
+            // 
+            // btnSelectXML
+            // 
+            this.btnSelectXML.Location = new System.Drawing.Point(6, 28);
+            this.btnSelectXML.Name = "btnSelectXML";
+            this.btnSelectXML.Size = new System.Drawing.Size(75, 23);
+            this.btnSelectXML.TabIndex = 1;
+            this.btnSelectXML.Text = "Select XML";
+            this.btnSelectXML.UseVisualStyleBackColor = true;
+            this.btnSelectXML.Click += new System.EventHandler(this.btnSelectXML_Click);
             // 
             // gbxGetXML
             // 
@@ -97,104 +188,43 @@
             this.gbxGetXML.TabStop = false;
             this.gbxGetXML.Text = "Get XML";
             // 
-            // btnAuthenticate
+            // rtxXMLMessageResult
             // 
-            this.btnAuthenticate.Location = new System.Drawing.Point(6, 57);
-            this.btnAuthenticate.Name = "btnAuthenticate";
-            this.btnAuthenticate.Size = new System.Drawing.Size(75, 23);
-            this.btnAuthenticate.TabIndex = 0;
-            this.btnAuthenticate.Text = "Authenticate";
-            this.btnAuthenticate.UseVisualStyleBackColor = true;
-            this.btnAuthenticate.Click += new System.EventHandler(this.btnAuthenticate_Click);
+            this.rtxXMLMessageResult.Location = new System.Drawing.Point(222, 20);
+            this.rtxXMLMessageResult.Name = "rtxXMLMessageResult";
+            this.rtxXMLMessageResult.Size = new System.Drawing.Size(548, 252);
+            this.rtxXMLMessageResult.TabIndex = 7;
+            this.rtxXMLMessageResult.Text = "";
             // 
-            // lblResponse
+            // txtMessageKey
             // 
-            this.lblResponse.AutoSize = true;
-            this.lblResponse.Location = new System.Drawing.Point(117, 62);
-            this.lblResponse.Name = "lblResponse";
-            this.lblResponse.Size = new System.Drawing.Size(58, 13);
-            this.lblResponse.TabIndex = 1;
-            this.lblResponse.Text = "Response:";
+            this.txtMessageKey.Enabled = false;
+            this.txtMessageKey.Location = new System.Drawing.Point(40, 116);
+            this.txtMessageKey.Name = "txtMessageKey";
+            this.txtMessageKey.Size = new System.Drawing.Size(137, 20);
+            this.txtMessageKey.TabIndex = 6;
+            this.txtMessageKey.Visible = false;
             // 
-            // lblResponseResult
+            // btnGetXML
             // 
-            this.lblResponseResult.AutoSize = true;
-            this.lblResponseResult.Location = new System.Drawing.Point(181, 62);
-            this.lblResponseResult.Name = "lblResponseResult";
-            this.lblResponseResult.Size = new System.Drawing.Size(125, 13);
-            this.lblResponseResult.TabIndex = 2;
-            this.lblResponseResult.Text = "Press button to get value";
+            this.btnGetXML.Location = new System.Drawing.Point(6, 71);
+            this.btnGetXML.Name = "btnGetXML";
+            this.btnGetXML.Size = new System.Drawing.Size(75, 23);
+            this.btnGetXML.TabIndex = 5;
+            this.btnGetXML.Text = "Get XML";
+            this.btnGetXML.UseVisualStyleBackColor = true;
+            this.btnGetXML.Click += new System.EventHandler(this.btnGetXML_Click);
             // 
-            // lblUsername
+            // lblKey
             // 
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.Location = new System.Drawing.Point(6, 26);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(58, 13);
-            this.lblUsername.TabIndex = 3;
-            this.lblUsername.Text = "Username:";
-            // 
-            // lblPassword
-            // 
-            this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(232, 26);
-            this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(56, 13);
-            this.lblPassword.TabIndex = 4;
-            this.lblPassword.Text = "Password:";
-            // 
-            // txtUsername
-            // 
-            this.txtUsername.Location = new System.Drawing.Point(70, 23);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(137, 20);
-            this.txtUsername.TabIndex = 5;
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.Location = new System.Drawing.Point(294, 23);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(137, 20);
-            this.txtPassword.TabIndex = 6;
-            // 
-            // btnSelectXML
-            // 
-            this.btnSelectXML.Location = new System.Drawing.Point(6, 28);
-            this.btnSelectXML.Name = "btnSelectXML";
-            this.btnSelectXML.Size = new System.Drawing.Size(75, 23);
-            this.btnSelectXML.TabIndex = 1;
-            this.btnSelectXML.Text = "Select XML";
-            this.btnSelectXML.UseVisualStyleBackColor = true;
-            this.btnSelectXML.Click += new System.EventHandler(this.btnSelectXML_Click);
-            // 
-            // btnSendXML
-            // 
-            this.btnSendXML.Enabled = false;
-            this.btnSendXML.Location = new System.Drawing.Point(6, 71);
-            this.btnSendXML.Name = "btnSendXML";
-            this.btnSendXML.Size = new System.Drawing.Size(75, 23);
-            this.btnSendXML.TabIndex = 2;
-            this.btnSendXML.Text = "Send XML";
-            this.btnSendXML.UseVisualStyleBackColor = true;
-            this.btnSendXML.Click += new System.EventHandler(this.btnSendXML_Click);
-            // 
-            // txtSendXMLPath
-            // 
-            this.txtSendXMLPath.Location = new System.Drawing.Point(87, 30);
-            this.txtSendXMLPath.Name = "txtSendXMLPath";
-            this.txtSendXMLPath.Size = new System.Drawing.Size(683, 20);
-            this.txtSendXMLPath.TabIndex = 6;
-            // 
-            // radOrganisation
-            // 
-            this.radOrganization.AutoSize = true;
-            this.radOrganization.Location = new System.Drawing.Point(9, 20);
-            this.radOrganization.Name = "radOrganization";
-            this.radOrganization.Size = new System.Drawing.Size(84, 17);
-            this.radOrganization.TabIndex = 0;
-            this.radOrganization.TabStop = true;
-            this.radOrganization.Text = "Organization";
-            this.radOrganization.UseVisualStyleBackColor = true;
+            this.lblKey.AutoSize = true;
+            this.lblKey.Enabled = false;
+            this.lblKey.Location = new System.Drawing.Point(6, 119);
+            this.lblKey.Name = "lblKey";
+            this.lblKey.Size = new System.Drawing.Size(28, 13);
+            this.lblKey.TabIndex = 4;
+            this.lblKey.Text = "Key:";
+            this.lblKey.Visible = false;
             // 
             // radShipment
             // 
@@ -207,56 +237,61 @@
             this.radShipment.Text = "Shipment";
             this.radShipment.UseVisualStyleBackColor = true;
             // 
-            // lblKey
+            // radOrganization
             // 
-            this.lblKey.AutoSize = true;
-            this.lblKey.Location = new System.Drawing.Point(6, 49);
-            this.lblKey.Name = "lblKey";
-            this.lblKey.Size = new System.Drawing.Size(28, 13);
-            this.lblKey.TabIndex = 4;
-            this.lblKey.Text = "Key:";
+            this.radOrganization.AutoSize = true;
+            this.radOrganization.Location = new System.Drawing.Point(9, 20);
+            this.radOrganization.Name = "radOrganization";
+            this.radOrganization.Size = new System.Drawing.Size(84, 17);
+            this.radOrganization.TabIndex = 0;
+            this.radOrganization.TabStop = true;
+            this.radOrganization.Text = "Organization";
+            this.radOrganization.UseVisualStyleBackColor = true;
             // 
-            // btnGetXML
+            // gbxMarkAsProcessed
             // 
-            this.btnGetXML.Enabled = false;
-            this.btnGetXML.Location = new System.Drawing.Point(6, 71);
-            this.btnGetXML.Name = "btnGetXML";
-            this.btnGetXML.Size = new System.Drawing.Size(75, 23);
-            this.btnGetXML.TabIndex = 5;
-            this.btnGetXML.Text = "Get XML";
-            this.btnGetXML.UseVisualStyleBackColor = true;
-            this.btnGetXML.Click += new System.EventHandler(this.btnGetXML_Click);
+            this.gbxMarkAsProcessed.Controls.Add(this.txtProcessedMessageID);
+            this.gbxMarkAsProcessed.Controls.Add(this.lblMarkAsProcessedMessageID);
+            this.gbxMarkAsProcessed.Controls.Add(this.btnMarkAsProcessed);
+            this.gbxMarkAsProcessed.Location = new System.Drawing.Point(12, 508);
+            this.gbxMarkAsProcessed.Name = "gbxMarkAsProcessed";
+            this.gbxMarkAsProcessed.Size = new System.Drawing.Size(776, 100);
+            this.gbxMarkAsProcessed.TabIndex = 3;
+            this.gbxMarkAsProcessed.TabStop = false;
+            this.gbxMarkAsProcessed.Text = "Mark as Processed";
             // 
-            // txtMessageKey
+            // txtProcessedMessageID
             // 
-            this.txtMessageKey.Location = new System.Drawing.Point(40, 46);
-            this.txtMessageKey.Name = "txtMessageKey";
-            this.txtMessageKey.Size = new System.Drawing.Size(137, 20);
-            this.txtMessageKey.TabIndex = 6;
+            this.txtProcessedMessageID.Location = new System.Drawing.Point(79, 13);
+            this.txtProcessedMessageID.Name = "txtProcessedMessageID";
+            this.txtProcessedMessageID.Size = new System.Drawing.Size(137, 20);
+            this.txtProcessedMessageID.TabIndex = 8;
             // 
-            // groupBox1
+            // lblMarkAsProcessedMessageID
             // 
-            this.groupBox1.Location = new System.Drawing.Point(12, 508);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(776, 100);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
+            this.lblMarkAsProcessedMessageID.AutoSize = true;
+            this.lblMarkAsProcessedMessageID.Location = new System.Drawing.Point(6, 16);
+            this.lblMarkAsProcessedMessageID.Name = "lblMarkAsProcessedMessageID";
+            this.lblMarkAsProcessedMessageID.Size = new System.Drawing.Size(67, 13);
+            this.lblMarkAsProcessedMessageID.TabIndex = 7;
+            this.lblMarkAsProcessedMessageID.Text = "Message ID:";
             // 
-            // rtxXMLMessageResult
+            // btnMarkAsProcessed
             // 
-            this.rtxXMLMessageResult.Location = new System.Drawing.Point(222, 20);
-            this.rtxXMLMessageResult.Name = "rtxXMLMessageResult";
-            this.rtxXMLMessageResult.Size = new System.Drawing.Size(548, 252);
-            this.rtxXMLMessageResult.TabIndex = 7;
-            this.rtxXMLMessageResult.Text = "";
+            this.btnMarkAsProcessed.Location = new System.Drawing.Point(6, 52);
+            this.btnMarkAsProcessed.Name = "btnMarkAsProcessed";
+            this.btnMarkAsProcessed.Size = new System.Drawing.Size(75, 42);
+            this.btnMarkAsProcessed.TabIndex = 6;
+            this.btnMarkAsProcessed.Text = "Mark as Processed";
+            this.btnMarkAsProcessed.UseVisualStyleBackColor = true;
+            this.btnMarkAsProcessed.Click += new System.EventHandler(this.btnMarkAsProcessed_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 726);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.gbxMarkAsProcessed);
             this.Controls.Add(this.gbxGetXML);
             this.Controls.Add(this.gbxSendXML);
             this.Controls.Add(this.gbxAuthentication);
@@ -269,6 +304,8 @@
             this.gbxSendXML.PerformLayout();
             this.gbxGetXML.ResumeLayout(false);
             this.gbxGetXML.PerformLayout();
+            this.gbxMarkAsProcessed.ResumeLayout(false);
+            this.gbxMarkAsProcessed.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -294,8 +331,11 @@
         private System.Windows.Forms.Label lblKey;
         private System.Windows.Forms.Button btnGetXML;
         private System.Windows.Forms.TextBox txtMessageKey;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox gbxMarkAsProcessed;
         private System.Windows.Forms.RichTextBox rtxXMLMessageResult;
+        private System.Windows.Forms.Button btnMarkAsProcessed;
+        private System.Windows.Forms.TextBox txtProcessedMessageID;
+        private System.Windows.Forms.Label lblMarkAsProcessedMessageID;
     }
 }
 

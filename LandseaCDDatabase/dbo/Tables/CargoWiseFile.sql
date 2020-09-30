@@ -7,7 +7,7 @@
     [SAPProcessed] BIT NOT NULL,
     [SAPProcessedDate] DATETIME NULL,
 	[LandseaProcessed] BIT NOT NULL,
-	[LandseaProcessedDate] DATETIME NOT NULL,
+	[LandseaProcessedDate] DATETIME NULL,
     CONSTRAINT [pk_CargoWiseFile_ID] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

@@ -23,7 +23,7 @@ namespace Demo
             InitializeComponent();
         }
 
-        private string authToken, bipAuthURL, landSeaOrderURL, bipExAPIURL;
+        private string authToken, bipAuthURL, landSeaOrderURL;
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -31,7 +31,10 @@ namespace Demo
 
             bipAuthURL = appSettingsReader.GetValue("BIPAuthURL", typeof(string)).ToString();
             landSeaOrderURL = appSettingsReader.GetValue("LandSeaOrderURL", typeof(string)).ToString();
-            bipExAPIURL = appSettingsReader.GetValue("BIPExAPIURL", typeof(string)).ToString();
+
+            //Testing only
+            txtUsername.Text = "LandseaAPIUser";
+            txtPassword.Text = "ujD@wxxg_z3Eg9aK";
         }
 
         private void btnAuthenticate_Click(object sender, EventArgs e)
@@ -75,8 +78,7 @@ namespace Demo
 
                 using (HttpClient client = new HttpClient())
                 {
-                    string BIPAPIService = landSeaOrderURL;
-                    client.BaseAddress = new Uri(BIPAPIService);
+                    client.BaseAddress = new Uri(landSeaOrderURL);
 
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
                     client.DefaultRequestHeaders.Add("BIPASK", authToken);
@@ -103,37 +105,36 @@ namespace Demo
         private void btnGetXML_Click(object sender, EventArgs e)
         {
             string selectedType = gbxGetXML.Controls.OfType<RadioButton>().FirstOrDefault(n => n.Checked).Text;
-            string type;
+            string type = string.Empty;
 
             if (selectedType == "Organization")
             {
                 type = "Organization";
             }
-            else
+            else if (selectedType == "Shipment")
             {
                 type = "ForwardingShipment";
             }
 
-            string key = txtMessageKey.Text;
+            //string key = txtMessageKey.Text;
 
-            if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(key))
+            //if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(type))
             {
+                MessageBox.Show("Please specify both type and message number.", "Failure");
             }
             else
             {
-                string apibody = "{ \"key\": \"" + type + "\", \"type\": \"" + key + "\"}";
-
                 APIRequestResponse requestResponse = new APIRequestResponse();
 
                 using (HttpClient client = new HttpClient())
                 {
-                    string BIPAPIService = bipExAPIURL;
-
-                    client.BaseAddress = new Uri(BIPAPIService);
+                    client.BaseAddress = new Uri(landSeaOrderURL);
 
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
                     client.DefaultRequestHeaders.Add("BIPASK", authToken);
-                    var res = client.PostAsJsonAsync("GetXMLDocs", apibody).Result;
+                    //HttpResponseMessage res = client.GetAsync("GetXMLDocs?key=" + key + "&type=" + type).Result;
+                    HttpResponseMessage res = client.GetAsync("GetXMLDocs?type=" + type).Result;
 
                     if (res.IsSuccessStatusCode)
                     {
@@ -143,6 +144,47 @@ namespace Demo
                     {
                         string resultString = res.Content.ReadAsStringAsync().Result;
                     }
+                }
+
+                rtxXMLMessageResult.Text = requestResponse.Data.ToString();
+            }
+        }
+
+        private void btnMarkAsProcessed_Click(object sender, EventArgs e)
+        {
+            string processedMessageID = txtProcessedMessageID.Text;
+
+            if (string.IsNullOrEmpty(processedMessageID))
+            {
+                MessageBox.Show("Please specify message ID.", "Failure");
+            }
+            else
+            {
+                try
+                {
+                    APIRequestResponse requestResponse = new APIRequestResponse();
+
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(landSeaOrderURL);
+
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
+                        client.DefaultRequestHeaders.Add("BIPASK", authToken);
+                        HttpResponseMessage res = client.GetAsync("SAPProcessed?messageID=" + processedMessageID).Result;
+
+                        if (res.IsSuccessStatusCode)
+                        {
+                            requestResponse = res.Content.ReadAsAsync<APIRequestResponse>().Result;
+                        }
+                        else
+                        {
+                            string resultString = res.Content.ReadAsStringAsync().Result;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             }
         }

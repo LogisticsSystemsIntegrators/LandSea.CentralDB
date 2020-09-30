@@ -24,14 +24,18 @@ BEGIN
 	FROM		[CargoWiseFile]
 	WHERE		[ID] = @MessageID;
 
-	IF @ReturnID > -1
+	IF @ReturnID > 0
 	BEGIN
 		UPDATE		[CargoWiseFile]
 		SET			[LandseaProcessed] = 1,
 					[LandseaProcessedDate] = GETDATE()
 		WHERE		[ID] = @MessageID
+	END
+	ELSE
+	BEGIN
+		SET		@ReturnID = -1;
 	END;
 
-	SELECT		@ReturnID;
+	SELECT @ReturnID;
 END
 

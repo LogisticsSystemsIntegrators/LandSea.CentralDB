@@ -21,9 +21,9 @@ AS
 BEGIN
 	DECLARE @XMLType VARCHAR(20), @Key VARCHAR(50);
 
-	SET @XMLType = COALESCE(@FileContext.value('(/*:UniversalEvent/*:Event/*:DataContext/*:DataSourceCollection/*:DataSource/*:Type)[1]', 'varchar(20)'), @FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:DataContext/*:DataSourceCollection/*:DataSource/*:Type)[1]', 'varchar(20)'));
+	SET @XMLType = COALESCE(@FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:DataContext/*:DataSourceCollection/*:DataSource/*:Type)[1]', 'varchar(20)'), @FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:DataContext/*:DataSourceCollection/*:DataSource/*:Type)[1]', 'varchar(20)'));
 
-	SET @Key = COALESCE(@FileContext.value('(/*:UniversalEvent/*:Event/*:DataContext/*:DataSourceCollection/*:DataSource/*:Key)[1]', 'varchar(50)'), @FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:DataContext/*:DataSourceCollection/*:DataSource/*:Key)[1]', 'varchar(50)'));
+	SET @Key = COALESCE(@FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:DataContext/*:DataSourceCollection/*:DataSource/*:Key)[1]', 'varchar(50)'), @FileContext.value('(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:DataContext/*:DataSourceCollection/*:DataSource/*:Key)[1]', 'varchar(50)'));
 
 	IF @XMLType IS NOT NULL AND @Key IS NOT NULL
 	BEGIN
