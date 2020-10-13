@@ -61,13 +61,13 @@ namespace XMLAPI.Controllers
 
                             sda.Fill(dtResult);
 
-                            int messageID = int.Parse(dtResult.Rows[0]["MessageID"].ToString());
-                            string xmlDoc = dtResult.Rows[0]["Message"].ToString();
-
                             conn.Close();
 
-                            if (xmlDoc != null && xmlDoc.Length > 0)
+                            if (dtResult.Rows.Count > 0)
                             {
+                                int messageID = int.Parse(dtResult.Rows[0]["MessageID"].ToString());
+                                string xmlDoc = dtResult.Rows[0]["Message"].ToString();
+
                                 var resultData = "{ \"MessageID\": " + messageID.ToString() + ", \"Message\": \"" + xmlDoc + "\" }";
 
                                 // If successful

@@ -146,7 +146,14 @@ namespace Demo
                     }
                 }
 
-                rtxXMLMessageResult.Text = requestResponse.Data.ToString();
+                if (requestResponse.Data == null)
+                {
+                    rtxXMLMessageResult.Text = requestResponse.Message + Environment.NewLine + requestResponse.MessageDetail;
+                }
+                else
+                {
+                    rtxXMLMessageResult.Text = requestResponse.Data.ToString();
+                }
             }
         }
 
