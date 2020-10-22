@@ -23,7 +23,7 @@ namespace Demo
             InitializeComponent();
         }
 
-        private string authToken, bipAuthURL, landSeaOrderURL;
+        private string authToken, bipAuthURL, landSeaOrderURL, bipAPIURL;
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -31,6 +31,7 @@ namespace Demo
 
             bipAuthURL = appSettingsReader.GetValue("BIPAuthURL", typeof(string)).ToString();
             landSeaOrderURL = appSettingsReader.GetValue("LandSeaOrderURL", typeof(string)).ToString();
+            bipAPIURL = appSettingsReader.GetValue("BIPAPIURL", typeof(string)).ToString();
 
             //Testing only
             txtUsername.Text = "LandseaAPIUser";
@@ -55,7 +56,7 @@ namespace Demo
             ofdSelectXML.CheckPathExists = true;
 
             ofdSelectXML.DefaultExt = "xml";
-            ofdSelectXML.Filter = "XML files (*.xml) | xml";
+            ofdSelectXML.Filter = "XML files (*.xml) | *.xml";
 
             if (ofdSelectXML.ShowDialog() == DialogResult.OK)
             {
@@ -78,7 +79,7 @@ namespace Demo
 
                 using (HttpClient client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri(landSeaOrderURL);
+                    client.BaseAddress = new Uri(bipAPIURL);
 
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
                     client.DefaultRequestHeaders.Add("BIPASK", authToken);
