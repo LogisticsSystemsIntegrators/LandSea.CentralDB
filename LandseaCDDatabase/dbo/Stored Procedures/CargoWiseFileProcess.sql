@@ -1,5 +1,4 @@
-﻿
-/******************************
+﻿/******************************
 ** Name: CargoWiseFileProcess
 ** Desc: Process CargoWiseFile entries for sending to SAP
 ** Auth: Dewald Nel
@@ -11,6 +10,7 @@
 ** --   --------			------------------------------------
 ** 1	2020-09-03			Creation
 ** 2	2020-09-25			Add XML Type (Shipment/Organisation), Search Value parameters
+** 3	2020-11-12			Remove SAPProcessed = 0 from first select
 *******************************/
 CREATE PROCEDURE [CargoWiseFileProcess]
 (
@@ -24,8 +24,7 @@ BEGIN
 
 	SELECT		TOP 1 @FileContextID = [ID]
 	FROM		[CargoWiseFile]
-	WHERE		[SAPProcessed] = 0
-	AND			[LandseaProcessed] = 0
+	WHERE		[LandseaProcessed] = 0
 	AND			[XMLType] = @XMLType
 	AND			(@KeyValue IS NULL OR [Key] = @KeyValue)
 	ORDER BY	[CreatedDate] ASC;

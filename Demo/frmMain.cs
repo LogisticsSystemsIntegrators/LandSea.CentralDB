@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 
 using Demo.Library;
 using Demo.Objects;
