@@ -68,5 +68,6 @@
     <Build Include="dbo\Stored Procedures\CargoWiseFileInsert.sql" />
     <Build Include="dbo\Stored Procedures\CargoWiseFileProcess.sql" />
     <Build Include="dbo\Stored Procedures\CargoWiseFileLandseaProcessed.sql" />
+    <Build Include="dbo\Stored Procedures\ETNNumberUpdate.sql" />
   </ItemGroup>
 </Project>

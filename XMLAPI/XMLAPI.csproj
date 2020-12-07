@@ -45,14 +45,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BIP.BaseAdapter">
+      <HintPath>..\BSW Components\BIP.BaseAdapter.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.Comms">
+      <HintPath>..\BSW Components\BIP.Comms.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.DataModel">
+      <HintPath>..\BSW Components\BIP.DataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.Enum">
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\Integration Platform\V7\StandAlone Testing\Base Components\BIP.Enum.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.MessageUtils">
+      <HintPath>..\BSW Components\BIP.MessageUtils.dll</HintPath>
+    </Reference>
     <Reference Include="BSW.APIResponse">
-      <HintPath>..\BSW Components\BSW.APIResponse.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIResponse.dll</HintPath>
     </Reference>
     <Reference Include="BSW.APIToken">
-      <HintPath>..\BSW Components\BSW.APIToken.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIToken.dll</HintPath>
+    </Reference>
+    <Reference Include="BSW.Data.Provider">
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\BSW.Data.Provider\bin\Release\BSW.Data.Provider.dll</HintPath>
     </Reference>
     <Reference Include="BSWCrypt">
-      <HintPath>..\BSW Components\BSWCrypt.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\LSI\Forte\TLCGOAPI\BSW Components\BSWCrypt.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -142,10 +160,16 @@
     <Compile Include="Action Filters\TokenValidationFilter.cs" />
     <Compile Include="Action Filters\UnhandledExceptionFilter.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ETNNumberController.cs" />
     <Compile Include="Controllers\XMLDocumentsController.cs" />
+    <Compile Include="DataAccess\Models\CargoWiseFileModel.cs" />
+    <Compile Include="DataAccess\Models\ETNNumberModel.cs" />
+    <Compile Include="DataAccess\Models\ModelBase.cs" />
+    <Compile Include="DataAccess\Providers\CargoWiseFileProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ProcessLogs.cs" />
     <Compile Include="Objects\CargoWiseXML.cs" />
     <Compile Include="Objects\ObjectTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

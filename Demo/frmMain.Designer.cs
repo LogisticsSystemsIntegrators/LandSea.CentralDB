@@ -52,6 +52,11 @@
             this.txtProcessedMessageID = new System.Windows.Forms.TextBox();
             this.lblMarkAsProcessedMessageID = new System.Windows.Forms.Label();
             this.btnMarkAsProcessed = new System.Windows.Forms.Button();
+            this.lblCWKey = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnUpdateETN = new System.Windows.Forms.Button();
+            this.txtCWKey = new System.Windows.Forms.TextBox();
+            this.txtETNNumber = new System.Windows.Forms.TextBox();
             this.gbxAuthentication.SuspendLayout();
             this.gbxSendXML.SuspendLayout();
             this.gbxGetXML.SuspendLayout();
@@ -183,7 +188,7 @@
             this.gbxGetXML.Controls.Add(this.radOrganization);
             this.gbxGetXML.Location = new System.Drawing.Point(12, 224);
             this.gbxGetXML.Name = "gbxGetXML";
-            this.gbxGetXML.Size = new System.Drawing.Size(776, 278);
+            this.gbxGetXML.Size = new System.Drawing.Size(776, 221);
             this.gbxGetXML.TabIndex = 2;
             this.gbxGetXML.TabStop = false;
             this.gbxGetXML.Text = "Get XML";
@@ -192,7 +197,7 @@
             // 
             this.rtxXMLMessageResult.Location = new System.Drawing.Point(222, 20);
             this.rtxXMLMessageResult.Name = "rtxXMLMessageResult";
-            this.rtxXMLMessageResult.Size = new System.Drawing.Size(548, 252);
+            this.rtxXMLMessageResult.Size = new System.Drawing.Size(548, 189);
             this.rtxXMLMessageResult.TabIndex = 7;
             this.rtxXMLMessageResult.Text = "";
             // 
@@ -253,9 +258,9 @@
             this.gbxMarkAsProcessed.Controls.Add(this.txtProcessedMessageID);
             this.gbxMarkAsProcessed.Controls.Add(this.lblMarkAsProcessedMessageID);
             this.gbxMarkAsProcessed.Controls.Add(this.btnMarkAsProcessed);
-            this.gbxMarkAsProcessed.Location = new System.Drawing.Point(12, 508);
+            this.gbxMarkAsProcessed.Location = new System.Drawing.Point(12, 451);
             this.gbxMarkAsProcessed.Name = "gbxMarkAsProcessed";
-            this.gbxMarkAsProcessed.Size = new System.Drawing.Size(776, 100);
+            this.gbxMarkAsProcessed.Size = new System.Drawing.Size(776, 46);
             this.gbxMarkAsProcessed.TabIndex = 3;
             this.gbxMarkAsProcessed.TabStop = false;
             this.gbxMarkAsProcessed.Text = "Mark as Processed";
@@ -278,19 +283,67 @@
             // 
             // btnMarkAsProcessed
             // 
-            this.btnMarkAsProcessed.Location = new System.Drawing.Point(6, 52);
+            this.btnMarkAsProcessed.Location = new System.Drawing.Point(235, 13);
             this.btnMarkAsProcessed.Name = "btnMarkAsProcessed";
-            this.btnMarkAsProcessed.Size = new System.Drawing.Size(75, 42);
+            this.btnMarkAsProcessed.Size = new System.Drawing.Size(136, 27);
             this.btnMarkAsProcessed.TabIndex = 6;
             this.btnMarkAsProcessed.Text = "Mark as Processed";
             this.btnMarkAsProcessed.UseVisualStyleBackColor = true;
             this.btnMarkAsProcessed.Click += new System.EventHandler(this.btnMarkAsProcessed_Click);
             // 
+            // lblCWKey
+            // 
+            this.lblCWKey.AutoSize = true;
+            this.lblCWKey.Location = new System.Drawing.Point(18, 525);
+            this.lblCWKey.Name = "lblCWKey";
+            this.lblCWKey.Size = new System.Drawing.Size(77, 13);
+            this.lblCWKey.TabIndex = 4;
+            this.lblCWKey.Text = "CaroWise Key:";
+            this.lblCWKey.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(303, 525);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(69, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "ETN Number";
+            // 
+            // btnUpdateETN
+            // 
+            this.btnUpdateETN.Location = new System.Drawing.Point(587, 518);
+            this.btnUpdateETN.Name = "btnUpdateETN";
+            this.btnUpdateETN.Size = new System.Drawing.Size(136, 27);
+            this.btnUpdateETN.TabIndex = 7;
+            this.btnUpdateETN.Text = "Update ETN Number";
+            this.btnUpdateETN.UseVisualStyleBackColor = true;
+            this.btnUpdateETN.Click += new System.EventHandler(this.btnUpdateETN_Click);
+            // 
+            // txtCWKey
+            // 
+            this.txtCWKey.Location = new System.Drawing.Point(101, 522);
+            this.txtCWKey.Name = "txtCWKey";
+            this.txtCWKey.Size = new System.Drawing.Size(178, 20);
+            this.txtCWKey.TabIndex = 9;
+            // 
+            // txtETNNumber
+            // 
+            this.txtETNNumber.Location = new System.Drawing.Point(388, 522);
+            this.txtETNNumber.Name = "txtETNNumber";
+            this.txtETNNumber.Size = new System.Drawing.Size(178, 20);
+            this.txtETNNumber.TabIndex = 10;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 623);
+            this.ClientSize = new System.Drawing.Size(800, 563);
+            this.Controls.Add(this.txtETNNumber);
+            this.Controls.Add(this.txtCWKey);
+            this.Controls.Add(this.btnUpdateETN);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lblCWKey);
             this.Controls.Add(this.gbxMarkAsProcessed);
             this.Controls.Add(this.gbxGetXML);
             this.Controls.Add(this.gbxSendXML);
@@ -307,6 +360,7 @@
             this.gbxMarkAsProcessed.ResumeLayout(false);
             this.gbxMarkAsProcessed.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -336,6 +390,11 @@
         private System.Windows.Forms.Button btnMarkAsProcessed;
         private System.Windows.Forms.TextBox txtProcessedMessageID;
         private System.Windows.Forms.Label lblMarkAsProcessedMessageID;
+        private System.Windows.Forms.Label lblCWKey;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnUpdateETN;
+        private System.Windows.Forms.TextBox txtCWKey;
+        private System.Windows.Forms.TextBox txtETNNumber;
     }
 }
 
