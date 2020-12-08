@@ -104,7 +104,7 @@ namespace Demo
 
             ETNNumberModel model = new ETNNumberModel
             {
-                CaroWiseKey = "S0000100655",
+                CaroWiseKey = "S00001006",
                 ETNNumber = "DOC16"
             };
             // Update ETN Numbers linked to Cargo Wise key
