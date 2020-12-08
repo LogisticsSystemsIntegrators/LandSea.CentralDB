@@ -70,6 +70,6 @@
     <Build Include="dbo\Stored Procedures\CargoWiseFileLandseaProcessed.sql" />
     <Build Include="dbo\Stored Procedures\ETNNumberUpdate.sql" />
     <Build Include="dbo\Tables\FileExtractionHistory.sql" />
-    <Build Include="dbo\Stored Procedures\PaymentExtraction.sql" />
+    <Build Include="dbo\Stored Procedures\SellerRefExtraction.sql" />
   </ItemGroup>
 </Project>

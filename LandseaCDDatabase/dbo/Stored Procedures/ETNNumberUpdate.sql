@@ -73,7 +73,7 @@ BEGIN
 		End
 
 
-	Delete From dbo.FileExtractionHistory Where CargoWiseKey = @CargoWiseKey And ExtractionType = 'PM';
+	Delete From dbo.FileExtractionHistory Where CargoWiseKey = @CargoWiseKey And ExtractionType = 'SF';
 
 END
 GO

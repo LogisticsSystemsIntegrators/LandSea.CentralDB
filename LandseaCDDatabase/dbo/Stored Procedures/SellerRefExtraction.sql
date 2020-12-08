@@ -1,7 +1,7 @@
 ﻿-- ====================================================================================
 -- Author:		BSW
 -- Create date: 2020-12-08
--- Description:	Extract CargoWise File with updated ETN Numbers - not already extrcted
+-- Description:	Extract CargoWise File with updated ETN Numbers - not already extracted
 ---
 --**************************
 --** Change History
@@ -10,7 +10,7 @@
 -- ----   ---			---------------------------------------------------------------
 -- 
 -- ====================================================================================
-CREATE PROCEDURE PaymentExtraction 
+CREATE PROCEDURE SellerRefExtraction 
  WITH ENCRYPTION
 AS
 BEGIN
@@ -24,7 +24,7 @@ BEGIN
 		,@CargoWiseKey = F.[Key]
 	From 
 		dbo.CargoWiseFile F 
-		Left Outer Join dbo.FileExtractionHistory EH On (F.ID = EH.CargoWiseFileID And EH.ExtractionType = 'PM')
+		Left Outer Join dbo.FileExtractionHistory EH On (F.ID = EH.CargoWiseFileID And EH.ExtractionType = 'SF')
 	Where 
 		F.ETNNumber IS NOT NULL
 		And EH.CargoWiseFileID IS NULL
@@ -36,7 +36,7 @@ BEGIN
 		Begin
 			
 			Insert Into dbo.FileExtractionHistory(CargoWiseFileID,CargoWiseKey,ExtractionType,ExtractionDate)
-			Values(@FileID,@CargoWiseKey,'PM',GETDATE());
+			Values(@FileID,@CargoWiseKey,'SF',GETDATE());
 
 			Select 
 				FileContext
