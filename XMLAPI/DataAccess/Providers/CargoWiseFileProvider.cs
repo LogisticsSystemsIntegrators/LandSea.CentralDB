@@ -10,7 +10,7 @@ namespace XMLAPI.DataAccess
     public class CargoWiseFileProvider:List<CargoWiseFileModel>,IProvider,IDisposable
     {
 
-        public bool UpdateETNNumber(string key, string etnNumebr, ref string msg)
+        public bool UpdateETNNumber(ETNNumberModel model, ref string msg)
         {
             bool result = true;
 
@@ -18,9 +18,11 @@ namespace XMLAPI.DataAccess
             {
                 List<SqlParameter> listParameters = new List<SqlParameter>();
 
-                listParameters.Add(ProviderManager.CreateParameter("@CargoWiseKey", key, SqlDbType.VarChar));
-                listParameters.Add(ProviderManager.CreateParameter("@ETNNumber", etnNumebr, SqlDbType.VarChar));
-             
+                listParameters.Add(ProviderManager.CreateParameter("@CargoWiseKey", model.CaroWiseKey, SqlDbType.VarChar));
+                listParameters.Add(ProviderManager.CreateParameter("@ETNNumber",model.ETNNumber, SqlDbType.VarChar));
+                if(!string.IsNullOrEmpty(model.GIBInvoiceNumber))
+                    listParameters.Add(ProviderManager.CreateParameter("@GIBInvoiceNumber", model.GIBInvoiceNumber, SqlDbType.VarChar));
+               
                 result = ProviderManager.ExecuteSP("ETNNumberUpdate", listParameters, ref msg);
 
             }

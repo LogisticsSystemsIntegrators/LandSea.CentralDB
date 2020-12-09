@@ -9,6 +9,7 @@
     [LandseaProcessed]     BIT          NOT NULL,
     [LandseaProcessedDate] DATETIME     NULL,
     [ETNNumber]            VARCHAR (20) NULL,
+    [GIBInvoiceNumber] VARCHAR(50) NULL, 
     CONSTRAINT [pk_CargoWiseFile_ID] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

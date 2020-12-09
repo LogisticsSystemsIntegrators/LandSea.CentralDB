@@ -65,7 +65,7 @@ namespace XMLAPI.Controllers
 
                 using (CargoWiseFileProvider provider = new CargoWiseFileProvider())
                 {
-                    if (!provider.UpdateETNNumber(etnDetail.CaroWiseKey, etnDetail.ETNNumber, ref msg))
+                    if (!provider.UpdateETNNumber(etnDetail, ref msg))
                     {
                         result.Success = false;
                         result.Message = "ETA Number Update Failed!";
@@ -90,6 +90,7 @@ namespace XMLAPI.Controllers
                     {
                         dt.Columns.Add("Key", typeof(string));
                         dt.Columns.Add("ETNNumber", typeof(string));
+                        dt.Columns.Add("GIBInvoiceNumber", typeof(string));
                         dt.Columns.Add("ResultMsg", typeof(string));
                         dt.Columns.Add("ResultDetailMsg", typeof(string));
                         dt.AcceptChanges();
@@ -97,6 +98,7 @@ namespace XMLAPI.Controllers
                         DataRow dr = dt.NewRow();
                         dr["Key"] = etnDetail.CaroWiseKey;
                         dr["ETNNumber"] = etnDetail.ETNNumber;
+                        dr["GIBInvoiceNumber"] = etnDetail.GIBInvoiceNumber;
                         dr["ResultMsg"] = result.Message;
                         dr["ResultDetailMsg"] = result.MessageDetail;
 
@@ -147,6 +149,7 @@ namespace XMLAPI.Controllers
                 }
                 bmessage.PromoteValue("CargoWiseKey", etnDetail.CaroWiseKey);
                 bmessage.PromoteValue("ETNNumber", etnDetail.ETNNumber);
+                bmessage.PromoteValue("GIBInvoiceNumber", etnDetail.GIBInvoiceNumber);
                 bmessage.webApiUrl = bipAPIURL;
                 bmessage.bipToken = bipToken;
                 bmessage.AttachmentID = 0;

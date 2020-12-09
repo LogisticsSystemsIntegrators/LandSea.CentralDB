@@ -105,7 +105,8 @@ namespace Demo
             ETNNumberModel model = new ETNNumberModel
             {
                 CaroWiseKey = "S00001006",
-                ETNNumber = "DOC16"
+                ETNNumber = "DOC16",
+                GIBInvoiceNumber = "LSG00000000001"
             };
             // Update ETN Numbers linked to Cargo Wise key
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (senderDetail, certificate, chain, sslPolicyErrors) => true;

@@ -9,10 +9,12 @@
 --** PR   Date				Description 
 -- ----   ---			---------------------------------------------------------------
 -- 01	2020-12-08		Add Update to new extaction history table/ ETN refernece filed on xml
+-- 02   2020-12-09		Add new GIB Invoice number column as part of the update to the table
 -- ====================================================================================
 CREATE PROCEDURE ETNNumberUpdate
 	@CargoWiseKey varchar(20),
-	@ETNNumber varchar(20)
+	@ETNNumber varchar(20),
+	@GIBInvoiceNumber varchar(50) = null
 WITH ENCRYPTION
 AS
 BEGIN
@@ -31,11 +33,12 @@ BEGIN
 
 	Update dbo.CargoWiseFile
 		Set ETNNUmber = @ETNNumber
+		,GIBInvoiceNumber = @GIBInvoiceNumber
 	Where 
 		[Key] = @CargoWiseKey;
 
 
-	--We need to update all the XML with the new ETN number - 1) Add the SellRefernce if it does not exists
+	--We need to update all the XML with the new ETN number - 1) Add the SellRefernce node if it does not exists
 	Select
 		@NodeCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)','INT') 
 	From 
@@ -59,6 +62,8 @@ BEGIN
 
 	--Make sure all values are 
 	Set @Done = @NodeCount;
+	
+	--Update and ensure that the seller refernece nodes all have the correct vlaues.
 
 	WHILE @Done > 0
 		Begin

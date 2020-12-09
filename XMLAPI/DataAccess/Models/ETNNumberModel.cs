@@ -9,5 +9,6 @@ namespace XMLAPI.DataAccess
     {
         public string CaroWiseKey { get; set; }
         public string ETNNumber { get; set; }
+        public string GIBInvoiceNumber { get; set; }
     }
 }
