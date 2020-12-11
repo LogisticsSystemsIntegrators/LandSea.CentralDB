@@ -57,6 +57,7 @@
             this.btnUpdateETN = new System.Windows.Forms.Button();
             this.txtCWKey = new System.Windows.Forms.TextBox();
             this.txtETNNumber = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.gbxAuthentication.SuspendLayout();
             this.gbxSendXML.SuspendLayout();
             this.gbxGetXML.SuspendLayout();
@@ -334,11 +335,22 @@
             this.txtETNNumber.Size = new System.Drawing.Size(178, 20);
             this.txtETNNumber.TabIndex = 10;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(587, 551);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(136, 27);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "Update Payment Detail";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 563);
+            this.ClientSize = new System.Drawing.Size(800, 589);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.txtETNNumber);
             this.Controls.Add(this.txtCWKey);
             this.Controls.Add(this.btnUpdateETN);
@@ -395,6 +407,7 @@
         private System.Windows.Forms.Button btnUpdateETN;
         private System.Windows.Forms.TextBox txtCWKey;
         private System.Windows.Forms.TextBox txtETNNumber;
+        private System.Windows.Forms.Button button1;
     }
 }
 
