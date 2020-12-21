@@ -34,10 +34,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BSW.APIResponse">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIResponse.dll</HintPath>
+      <HintPath>..\..\..\..\BSW Components\BSW.APIResponse.dll</HintPath>
     </Reference>
     <Reference Include="BSW.APIToken">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIToken.dll</HintPath>
+      <HintPath>..\..\..\..\BSW Components\BSW.APIToken.dll</HintPath>
     </Reference>
     <Reference Include="BSWCrypt">
       <HintPath>..\..\..\..\BSW Components\BSWCrypt.dll</HintPath>

@@ -20,8 +20,8 @@ namespace XMLAPI.Controllers
         private string bipAPIURL = string.Empty;
         private string bipToken = string.Empty;
         private string logFilePath = string.Empty;
-        private int ActiveProfileID = 0;
-        private int ProfileProcessID = 0;
+        private int GetXMLDocsProfileID = 0;
+        private int SAPProcessedProfileID = 0;
 
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -101,7 +101,7 @@ namespace XMLAPI.Controllers
                                 result.Message = "Document successfully retrieved.";
                                 result.MessageDetail = "New CargoWise document was successfully retrieved.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, GetXMLDocsProfileID);
                             }
                             else
                             {
@@ -109,7 +109,7 @@ namespace XMLAPI.Controllers
                                 result.Message = "No documents available.";
                                 result.MessageDetail = "No new CargoWise XML documents available at this moment. Please try again later.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, GetXMLDocsProfileID);
                             }
                         }
 
@@ -124,12 +124,14 @@ namespace XMLAPI.Controllers
                             {
                                 dt.Columns.Add("RequestedType", typeof(string));
                                 dt.Columns.Add("ResultMsg", typeof(string));
+                                dt.Columns.Add("ResultData", typeof(string));
                                 dt.Columns.Add("ResultDetailMsg", typeof(string));
                                 dt.AcceptChanges();
 
                                 DataRow dr = dt.NewRow();
                                 dr["RequestedType"] = type;
                                 dr["ResultMsg"] = result.Message;
+                                dr["ResultData"] = result.Data;
                                 dr["ResultDetailMsg"] = result.MessageDetail;
 
                                 dt.Rows.Add(dr);
@@ -156,7 +158,7 @@ namespace XMLAPI.Controllers
                             newHistory.Add(new MessageHistoryModel
                             {
                                 EventDesc = "Request received from LandSea XML API Service - Get XML Documents",
-                                ProfileProcessID = ProfileProcessID,
+                                ProfileProcessID = GetXMLDocsProfileID,
                                 EventTypeID = (byte)EventLogType.Information,
                                 MessageStatusID = 1,
                                 DoneBy = "LandSea API Service"
@@ -169,7 +171,7 @@ namespace XMLAPI.Controllers
                             newHistory.Add(new MessageHistoryModel
                             {
                                 EventDesc = result.Message + " Detail: " + result.MessageDetail,
-                                ProfileProcessID = ProfileProcessID,
+                                ProfileProcessID = GetXMLDocsProfileID,
                                 EventTypeID = (byte)EventLogType.Error,
                                 MessageStatusID = 2,
                                 DoneBy = "LandSea API Service"
@@ -180,11 +182,11 @@ namespace XMLAPI.Controllers
                         bmessage.bipToken = bipToken;
                         bmessage.AttachmentID = 0;
                         bmessage.XMLContext = string.Empty;
-                        bmessage.ProfileID = ActiveProfileID;
+                        bmessage.ProfileID = GetXMLDocsProfileID;
                         bmessage.CreatedBy = "LandSea XML API Service";
                         bmessage.ReProcessed = false;
                         bmessage.PublishMessageID = null;
-                        bmessage.ProfileProcessID = ProfileProcessID;
+                        bmessage.ProfileProcessID = GetXMLDocsProfileID;
 
                         bool saveResult = true;
                         using (UpdateMessage sMessage = new BIP.MessageUtils.UpdateMessage())
@@ -206,7 +208,7 @@ namespace XMLAPI.Controllers
                         result.Message = ex.Message;
                         result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
 
-                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
+                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, GetXMLDocsProfileID);
                     }
                     finally
                     {
@@ -221,7 +223,7 @@ namespace XMLAPI.Controllers
                 result.Message = ex.Message;
                 result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
 
-                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
+                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, GetXMLDocsProfileID);
             }
 
             return result;
@@ -314,7 +316,7 @@ namespace XMLAPI.Controllers
                                 result.Message = "Document successfully retrieved.";
                                 result.MessageDetail = "New CargoWise document was successfully retrieved.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, GetXMLDocsProfileID);
                             }
                             else
                             {
@@ -322,7 +324,7 @@ namespace XMLAPI.Controllers
                                 result.Message = "No documents available.";
                                 result.MessageDetail = "No new CargoWise XML documents available at this moment. Please try again later.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, GetXMLDocsProfileID);
                             }
                         }
 
@@ -338,6 +340,7 @@ namespace XMLAPI.Controllers
                                 dt.Columns.Add("RequestedMessageID", typeof(string));
                                 dt.Columns.Add("RequestedType", typeof(string));
                                 dt.Columns.Add("ResultMsg", typeof(string));
+                                dt.Columns.Add("ResultData", typeof(string));
                                 dt.Columns.Add("ResultDetailMsg", typeof(string));
                                 dt.AcceptChanges();
 
@@ -345,6 +348,7 @@ namespace XMLAPI.Controllers
                                 dr["RequestedMessageID"] = key;
                                 dr["RequestedType"] = type;
                                 dr["ResultMsg"] = result.Message;
+                                dr["ResultData"] = result.Data;
                                 dr["ResultDetailMsg"] = result.MessageDetail;
 
                                 dt.Rows.Add(dr);
@@ -371,7 +375,7 @@ namespace XMLAPI.Controllers
                             newHistory.Add(new MessageHistoryModel
                             {
                                 EventDesc = "Request received from LandSea XML API Service - Get XML Documents",
-                                ProfileProcessID = ProfileProcessID,
+                                ProfileProcessID = GetXMLDocsProfileID,
                                 EventTypeID = (byte)EventLogType.Information,
                                 MessageStatusID = 1,
                                 DoneBy = "LandSea API Service"
@@ -384,7 +388,7 @@ namespace XMLAPI.Controllers
                             newHistory.Add(new MessageHistoryModel
                             {
                                 EventDesc = result.Message + " Detail: " + result.MessageDetail,
-                                ProfileProcessID = ProfileProcessID,
+                                ProfileProcessID = GetXMLDocsProfileID,
                                 EventTypeID = (byte)EventLogType.Error,
                                 MessageStatusID = 2,
                                 DoneBy = "LandSea API Service"
@@ -397,11 +401,11 @@ namespace XMLAPI.Controllers
                         bmessage.bipToken = bipToken;
                         bmessage.AttachmentID = 0;
                         bmessage.XMLContext = string.Empty;
-                        bmessage.ProfileID = ActiveProfileID;
+                        bmessage.ProfileID = GetXMLDocsProfileID;
                         bmessage.CreatedBy = "LandSea XML API Service";
                         bmessage.ReProcessed = false;
                         bmessage.PublishMessageID = null;
-                        bmessage.ProfileProcessID = ProfileProcessID;
+                        bmessage.ProfileProcessID = GetXMLDocsProfileID;
 
                         bool saveResult = true;
                         using (UpdateMessage sMessage = new BIP.MessageUtils.UpdateMessage())
@@ -452,7 +456,6 @@ namespace XMLAPI.Controllers
                 string messageDetail = string.Empty;
 
                 string centralDBURL = ConfigurationManager.ConnectionStrings["LandseaDB"].ToString();
-
 
                 if (!LoadSettings())
                 {
@@ -515,7 +518,7 @@ namespace XMLAPI.Controllers
                                 result.Message = "SAP Message Processed flag successfully updated.";
                                 result.MessageDetail = "SAP Message Processed flag successfully updated.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, SAPProcessedProfileID);
                             }
                             else
                             {
@@ -523,9 +526,99 @@ namespace XMLAPI.Controllers
                                 result.Message = "SAP Message Processed flag update failed.";
                                 result.MessageDetail = "SAP Message Processed flag update failed - please ensure the Message ID is correct.";
 
-                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Error, ActiveProfileID);
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Error, SAPProcessedProfileID);
                             }
                         }
+
+                        #region BIP Message
+                        //we need to create a new message in BIP
+                        BaseMessage bmessage = new BaseMessage();
+                        List<MessageHistoryModel> newHistory = new List<MessageHistoryModel>();
+
+                        using (DataSet ds = new DataSet("SAPProcessed"))
+                        {
+                            using (DataTable dt = new DataTable("SAPProcessed"))
+                            {
+                                dt.Columns.Add("RequestedMessageID", typeof(string));
+                                dt.Columns.Add("ResultMsg", typeof(string));
+                                dt.Columns.Add("ResultData", typeof(string));
+                                dt.Columns.Add("ResultDetailMsg", typeof(string));
+                                dt.AcceptChanges();
+
+                                DataRow dr = dt.NewRow();
+                                dr["RequestedMessageID"] = messageID;
+                                dr["ResultMsg"] = result.Message;
+                                dr["ResultData"] = result.Data;
+                                dr["ResultDetailMsg"] = result.MessageDetail;
+
+                                dt.Rows.Add(dr);
+                                dt.AcceptChanges();
+
+                                ds.Tables.Add(dt);
+                                ds.AcceptChanges();
+
+                                using (TextWriter write = new StringWriter())
+                                {
+                                    //convert the results into xml   
+                                    ds.WriteXml(write);
+                                    //also convert the xml into byte arry
+                                    bmessage.Context = new byte[write.ToString().Length * sizeof(char)];
+                                    System.Buffer.BlockCopy(write.ToString().ToCharArray(), 0, bmessage.Context, 0, bmessage.Context.Length);
+                                }
+                            }
+                        }
+
+                        if (result.Success)
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Processing;
+                            bmessage.MessageStatus = InternalStatus.Processing;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = "Request received from LandSea XML API Service - Get XML Documents",
+                                ProfileProcessID = SAPProcessedProfileID,
+                                EventTypeID = (byte)EventLogType.Information,
+                                MessageStatusID = 1,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+                        else
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Suspended;
+                            bmessage.MessageStatus = InternalStatus.Suspended;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = result.Message + " Detail: " + result.MessageDetail,
+                                ProfileProcessID = SAPProcessedProfileID,
+                                EventTypeID = (byte)EventLogType.Error,
+                                MessageStatusID = 2,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+
+                        bmessage.PromoteValue("RequestedMessageID", messageID.ToString());
+                        bmessage.webApiUrl = bipAPIURL;
+                        bmessage.bipToken = bipToken;
+                        bmessage.AttachmentID = 0;
+                        bmessage.XMLContext = string.Empty;
+                        bmessage.ProfileID = SAPProcessedProfileID;
+                        bmessage.CreatedBy = "LandSea XML API Service";
+                        bmessage.ReProcessed = false;
+                        bmessage.PublishMessageID = null;
+                        bmessage.ProfileProcessID = SAPProcessedProfileID;
+
+                        bool saveResult = true;
+                        using (UpdateMessage sMessage = new BIP.MessageUtils.UpdateMessage())
+                        {
+                            saveResult = sMessage.SaveMessageDetail(bmessage, newHistory, BIP.Enum.MessageType.Incomming, ref messageDetail);
+                        }
+
+                        if (!saveResult)
+                        {
+                            result.Success = false;
+                            result.Message = "Failed to Update BIP process";
+                            result.MessageDetail = messageDetail;
+                        }
+                        #endregion BIP Message
                     }
                     catch (Exception ex)
                     {
@@ -533,7 +626,7 @@ namespace XMLAPI.Controllers
                         result.Message = ex.Message;
                         result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
 
-                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
+                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, SAPProcessedProfileID);
                     }
                     finally
                     {
@@ -548,7 +641,7 @@ namespace XMLAPI.Controllers
                 result.Message = ex.Message;
                 result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
 
-                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
+                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, SAPProcessedProfileID);
             }
 
             return result;
@@ -565,11 +658,11 @@ namespace XMLAPI.Controllers
 
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["XMLDocsGet"]))
                 {
-                    ActiveProfileID = int.Parse(ConfigurationManager.AppSettings["XMLDocsGet"]);
+                    GetXMLDocsProfileID = int.Parse(ConfigurationManager.AppSettings["XMLDocsGet"]);
                 }
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["XMLDocsSAPProcessedUpdate"]))
                 {
-                    ProfileProcessID = int.Parse(ConfigurationManager.AppSettings["XMLDocsSAPProcessedUpdate"]);
+                    SAPProcessedProfileID = int.Parse(ConfigurationManager.AppSettings["XMLDocsSAPProcessedUpdate"]);
                 }
             }
             catch (Exception exp)
