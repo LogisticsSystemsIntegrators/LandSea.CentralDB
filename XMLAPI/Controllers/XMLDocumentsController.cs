@@ -1,18 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
+﻿using System;
 using System.Configuration;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using System.Xml;
-using System.Xml.Serialization;
 using System.Data;
 using System.Data.SqlClient;
 
 using BSW.APIResponse;
-using XMLAPI.Objects;
 
 namespace XMLAPI.Controllers
 {
@@ -281,5 +274,7 @@ namespace XMLAPI.Controllers
 
             return result;
         }
+
+
     }
 }

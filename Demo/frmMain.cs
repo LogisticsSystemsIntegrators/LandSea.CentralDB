@@ -12,6 +12,8 @@ using System.Net.Http;
 
 using Demo.Library;
 using Demo.Objects;
+using Newtonsoft.Json.Linq;
+using BSW.APIResponse;
 
 namespace Demo
 {
@@ -65,6 +67,141 @@ namespace Demo
             if (!string.IsNullOrEmpty(txtSendXMLPath.Text.Trim()))
             {
                 btnSendXML.Enabled = true;
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnUpdateETN_Click(object sender, EventArgs e)
+        {
+            APIRequestResponse apiResponse = new APIRequestResponse();
+            string tokenReturnValue = string.Empty;
+            string tokenvalue = string.Empty;
+            System.Net.WebRequest req = System.Net.WebRequest.Create("http://129.232.164.178/BIPEXAPI/Authentication?username=LandseaAPIUser&password=ujD@wxxg_z3Eg9aK");
+            req.ContentType = "application/x-www-form-urlencoded";
+            req.Method = "GET";
+
+            string tokenResponse = string.Empty;
+            System.Net.WebResponse resp = req.GetResponse();
+            if (resp == null)
+            {
+                MessageBox.Show("Authentication Failed");
+                return;
+            }
+
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(resp.GetResponseStream()))
+            {
+                tokenResponse = sr.ReadToEnd().Trim();
+            }
+            if (!string.IsNullOrEmpty(tokenResponse))
+            {
+                tokenReturnValue = "Data";
+                tokenvalue = JObject.Parse(tokenResponse)[tokenReturnValue].ToString();
+            }
+
+            ETNNumberModel model = new ETNNumberModel
+            {
+                CaroWiseKey = "S00001006",
+                ETNNumber = "DOC16",
+                GIBInvoiceNumber = "LSG00000000001"
+            };
+            // Update ETN Numbers linked to Cargo Wise key
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (senderDetail, certificate, chain, sslPolicyErrors) => true;
+            using (HttpClient client = new HttpClient(new HttpClientHandler { ClientCertificateOptions = ClientCertificateOption.Automatic }))
+            {
+                string landseaAPIURL = "http://129.232.164.178/LandSeaGlobal/LandseaAPI/api/ETNNumber/";
+                //string landseaAPIURL = "http://localhost:51203/api/ETNNumber/";
+                client.BaseAddress = new Uri(landseaAPIURL);
+
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", tokenvalue);
+                client.DefaultRequestHeaders.Add("BIPASK", authToken);
+                HttpResponseMessage res = client.PutAsJsonAsync("Update",model).Result;
+
+                if (res.IsSuccessStatusCode)
+                {
+                    apiResponse = res.Content.ReadAsAsync<APIRequestResponse>().Result;
+                    MessageBox.Show(apiResponse.ToString());
+                }
+                else
+                {
+                    string resultString = res.Content.ReadAsStringAsync().Result;
+                    MessageBox.Show(resultString);
+                   
+                }
+            }
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            APIRequestResponse apiResponse = new APIRequestResponse();
+            string tokenReturnValue = string.Empty;
+            string tokenvalue = string.Empty;
+            System.Net.WebRequest req = System.Net.WebRequest.Create("http://129.232.164.178/BIPEXAPI/Authentication?username=LandseaAPIUser&password=ujD@wxxg_z3Eg9aK");
+            req.ContentType = "application/x-www-form-urlencoded";
+            req.Method = "GET";
+
+            string tokenResponse = string.Empty;
+            System.Net.WebResponse resp = req.GetResponse();
+            if (resp == null)
+            {
+                MessageBox.Show("Authentication Failed");
+                return;
+            }
+
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(resp.GetResponseStream()))
+            {
+                tokenResponse = sr.ReadToEnd().Trim();
+            }
+            if (!string.IsNullOrEmpty(tokenResponse))
+            {
+                tokenReturnValue = "Data";
+                tokenvalue = JObject.Parse(tokenResponse)[tokenReturnValue].ToString();
+            }
+
+            string sendString = "<Payments>";
+            sendString += "<Payment>";
+            sendString += "<CompanyCode>IST</CompanyCode>";
+            sendString += "<OrgCode>KASDUAIST</OrgCode>";
+            sendString += "<LedgerType>AR</LedgerType>";
+            sendString += "<TransactionType>INV</TransactionType>";
+            sendString += "<TransactionNo>S00001004</TransactionNo>";
+            sendString += "<JobNumber/>";
+            sendString += "<PaymentReference>Payment Testing</PaymentReference>";
+            sendString += "<IntReference>Payment to BSW</IntReference>";
+            sendString += "<Amount>150.00</Amount>";
+            sendString += "<PaidUpDate/>";
+            sendString += "</Payment>";
+            sendString += "</Payments>";
+
+
+            // Update ETN Numbers linked to Cargo Wise key
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (senderDetail, certificate, chain, sslPolicyErrors) => true;
+            using (HttpClient client = new HttpClient(new HttpClientHandler { ClientCertificateOptions = ClientCertificateOption.Automatic }))
+            {
+                string landseaAPIURL = "http://129.232.164.178/LandSeaGlobal/LandseaAPI/api/Accounting/";
+                //string landseaAPIURL = "http://localhost:51203/api/Accounting/";
+                client.BaseAddress = new Uri(landseaAPIURL);
+
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", tokenvalue);
+                client.DefaultRequestHeaders.Add("BIPASK", authToken);
+                HttpResponseMessage res = client.PostAsJsonAsync("UpdateInvoicePaymentDetails", sendString).Result;
+
+                if (res.IsSuccessStatusCode)
+                {
+                    apiResponse = res.Content.ReadAsAsync<APIRequestResponse>().Result;
+                    MessageBox.Show(apiResponse.ToString());
+                }
+                else
+                {
+                    string resultString = res.Content.ReadAsStringAsync().Result;
+                    MessageBox.Show(resultString);
+
+                }
             }
         }
 

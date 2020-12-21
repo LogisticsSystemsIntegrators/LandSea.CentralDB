@@ -45,14 +45,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BIP.BaseAdapter">
+      <HintPath>..\BSW Components\BIP.BaseAdapter.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.Comms">
+      <HintPath>..\BSW Components\BIP.Comms.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.DataModel">
+      <HintPath>..\BSW Components\BIP.DataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.Enum">
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\Integration Platform\V7\StandAlone Testing\Base Components\BIP.Enum.dll</HintPath>
+    </Reference>
+    <Reference Include="BIP.MessageUtils">
+      <HintPath>..\BSW Components\BIP.MessageUtils.dll</HintPath>
+    </Reference>
     <Reference Include="BSW.APIResponse">
-      <HintPath>..\BSW Components\BSW.APIResponse.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIResponse.dll</HintPath>
     </Reference>
     <Reference Include="BSW.APIToken">
-      <HintPath>..\BSW Components\BSW.APIToken.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIToken.dll</HintPath>
+    </Reference>
+    <Reference Include="BSW.Data.Provider">
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\BSW.Data.Provider\bin\Release\BSW.Data.Provider.dll</HintPath>
     </Reference>
     <Reference Include="BSWCrypt">
-      <HintPath>..\BSW Components\BSWCrypt.dll</HintPath>
+      <HintPath>..\..\..\..\..\LPS\Projects\Development\LSI\Forte\TLCGOAPI\BSW Components\BSWCrypt.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -62,6 +80,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
@@ -142,19 +161,45 @@
     <Compile Include="Action Filters\TokenValidationFilter.cs" />
     <Compile Include="Action Filters\UnhandledExceptionFilter.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Connected Services\CargoWisePaymentService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\AccountingController.cs" />
+    <Compile Include="Controllers\ETNNumberController.cs" />
     <Compile Include="Controllers\XMLDocumentsController.cs" />
+    <Compile Include="DataAccess\Models\CargoWiseFileModel.cs" />
+    <Compile Include="DataAccess\Models\ETNNumberModel.cs" />
+    <Compile Include="DataAccess\Models\ModelBase.cs" />
+    <Compile Include="DataAccess\Providers\CargoWiseFileProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ProcessLogs.cs" />
     <Compile Include="Objects\CargoWiseXML.cs" />
     <Compile Include="Objects\ObjectTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\FailedReponseMessage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Connected Services\CargoWisePaymentService\UpdateInvoicePaymentDetailsService.disco" />
+    <None Include="Connected Services\CargoWisePaymentService\configuration91.svcinfo" />
+    <None Include="Connected Services\CargoWisePaymentService\configuration.svcinfo" />
+    <None Include="Connected Services\CargoWisePaymentService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Connected Services\CargoWisePaymentService\UpdateInvoicePaymentDetailsService.wsdl" />
+    <Content Include="Connected Services\CargoWisePaymentService\XMLAPI.CargoWisePaymentService.UpdateInvoicePaymentDetailsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Connected Services\CargoWisePaymentService\XMLAPI.CargoWisePaymentService.UpdateInvoicePaymentDetailsResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
     <None Include="Properties\PublishProfiles\LandseaGlobal API.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -180,6 +225,12 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\CargoWisePaymentService\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
