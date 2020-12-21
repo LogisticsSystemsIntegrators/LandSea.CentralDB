@@ -4,16 +4,28 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.IO;
 
+using BIP.DataModel;
+using BIP.Enum;
+using BIP.BaseAdapter;
+using BIP.MessageUtils;
 using BSW.APIResponse;
 
 namespace XMLAPI.Controllers
 {
     public class XMLDocumentsController : ApiController
     {
+        private string bipAPIURL = string.Empty;
+        private string bipToken = string.Empty;
+        private string logFilePath = string.Empty;
+        private int ActiveProfileID = 0;
+        private int ProfileProcessID = 0;
+
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public RequestReponse GetXMLDocs(string type)
+        public RequestReponse GetXMLDocs([FromUri]string type)
         {
             RequestReponse result = new RequestReponse();
 
@@ -22,15 +34,35 @@ namespace XMLAPI.Controllers
                 // XML document result will be passed in here as a string
                 string messageDetail = string.Empty;
 
-                string centralDBURL = ConfigurationManager.AppSettings["LandseaCD"].ToString();
+                string centralDBURL = ConfigurationManager.ConnectionStrings["LandseaDB"].ToString();
 
-                if (string.IsNullOrEmpty(centralDBURL))
+                if (!LoadSettings())
                 {
                     result.Success = false;
-                    result.Message = "Landsea Global Central Database - internal configuration problem";
-                    result.MessageDetail = "Landsea Global - Landsea Global Central Database connection was not configured correctly.";
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Failed to read configuration settings.";
                     return result;
                 }
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    result.Success = false;
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Document Type is missing.";
+                    return result;
+                }
+
+                if (!GenerateBIPToken())
+                {
+                    result.Success = false;
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Internal security token generation failed";
+                    return result;
+                }
+
+                ProcessLogs.bipToken = bipToken;
+                ProcessLogs.logFilePath = logFilePath;
+                ProcessLogs.webApiUrl = bipAPIURL;
 
                 #region Get CargoWise XML Documents
                 using (SqlConnection conn = new SqlConnection(centralDBURL))
@@ -68,20 +100,113 @@ namespace XMLAPI.Controllers
                                 result.Success = true;
                                 result.Message = "Document successfully retrieved.";
                                 result.MessageDetail = "New CargoWise document was successfully retrieved.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
                             }
                             else
                             {
                                 result.Success = true;
                                 result.Message = "No documents available.";
                                 result.MessageDetail = "No new CargoWise XML documents available at this moment. Please try again later.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, ActiveProfileID);
                             }
                         }
+
+                        #region BIP Message
+                        //we need to create a new message in BIP
+                        BaseMessage bmessage = new BaseMessage();
+                        List<MessageHistoryModel> newHistory = new List<MessageHistoryModel>();
+
+                        using (DataSet ds = new DataSet("XMLDocs"))
+                        {
+                            using (DataTable dt = new DataTable("XMLDocsGet"))
+                            {
+                                dt.Columns.Add("RequestedType", typeof(string));
+                                dt.Columns.Add("ResultMsg", typeof(string));
+                                dt.Columns.Add("ResultDetailMsg", typeof(string));
+                                dt.AcceptChanges();
+
+                                DataRow dr = dt.NewRow();
+                                dr["RequestedType"] = type;
+                                dr["ResultMsg"] = result.Message;
+                                dr["ResultDetailMsg"] = result.MessageDetail;
+
+                                dt.Rows.Add(dr);
+                                dt.AcceptChanges();
+
+                                ds.Tables.Add(dt);
+                                ds.AcceptChanges();
+
+                                using (TextWriter write = new StringWriter())
+                                {
+                                    //convert the results into xml   
+                                    ds.WriteXml(write);
+                                    //also convert the xml into byte arry
+                                    bmessage.Context = new byte[write.ToString().Length * sizeof(char)];
+                                    System.Buffer.BlockCopy(write.ToString().ToCharArray(), 0, bmessage.Context, 0, bmessage.Context.Length);
+                                }
+                            }
+                        }
+
+                        if (result.Success)
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Processing;
+                            bmessage.MessageStatus = InternalStatus.Processing;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = "Request received from LandSea XML API Service - Get XML Documents",
+                                ProfileProcessID = ProfileProcessID,
+                                EventTypeID = (byte)EventLogType.Information,
+                                MessageStatusID = 1,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+                        else
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Suspended;
+                            bmessage.MessageStatus = InternalStatus.Suspended;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = result.Message + " Detail: " + result.MessageDetail,
+                                ProfileProcessID = ProfileProcessID,
+                                EventTypeID = (byte)EventLogType.Error,
+                                MessageStatusID = 2,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+                        bmessage.PromoteValue("SentType", type);
+                        bmessage.webApiUrl = bipAPIURL;
+                        bmessage.bipToken = bipToken;
+                        bmessage.AttachmentID = 0;
+                        bmessage.XMLContext = string.Empty;
+                        bmessage.ProfileID = ActiveProfileID;
+                        bmessage.CreatedBy = "LandSea XML API Service";
+                        bmessage.ReProcessed = false;
+                        bmessage.PublishMessageID = null;
+                        bmessage.ProfileProcessID = ProfileProcessID;
+
+                        bool saveResult = true;
+                        using (UpdateMessage sMessage = new BIP.MessageUtils.UpdateMessage())
+                        {
+                            saveResult = sMessage.SaveMessageDetail(bmessage, newHistory, BIP.Enum.MessageType.Incomming, ref messageDetail);
+                        }
+
+                        if (!saveResult)
+                        {
+                            result.Success = false;
+                            result.Message = "Failed to Update BIP process";
+                            result.MessageDetail = messageDetail;
+                        }
+                        #endregion BIP Message
                     }
                     catch (Exception ex)
                     {
                         result.Success = false;
                         result.Message = ex.Message;
                         result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
+
+                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
                     }
                     finally
                     {
@@ -95,6 +220,8 @@ namespace XMLAPI.Controllers
                 result.Success = false;
                 result.Message = ex.Message;
                 result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
+
+                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
             }
 
             return result;
@@ -102,7 +229,7 @@ namespace XMLAPI.Controllers
 
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public RequestReponse GetXMLDocs(string key, string type)
+        public RequestReponse GetXMLDocs([FromUri]string key, [FromUri]string type)
         {
             RequestReponse result = new RequestReponse();
 
@@ -111,15 +238,43 @@ namespace XMLAPI.Controllers
                 // XML document result will be passed in here as a string
                 string messageDetail = string.Empty;
 
-                string centralDBURL = ConfigurationManager.AppSettings["LandseaCD"].ToString();
+                string centralDBURL = ConfigurationManager.ConnectionStrings["LandseaDB"].ToString();
 
-                if (string.IsNullOrEmpty(centralDBURL))
+                if (!LoadSettings())
                 {
                     result.Success = false;
-                    result.Message = "Landsea Global Central Database - internal configuration problem";
-                    result.MessageDetail = "Landsea Global - Landsea Global Central Database connection was not configured correctly.";
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Failed to read configuration settings.";
                     return result;
                 }
+
+                if (string.IsNullOrEmpty(key))
+                {
+                    result.Success = false;
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Document Message ID (Key) is missing.";
+                    return result;
+                }
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    result.Success = false;
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Document Type is missing.";
+                    return result;
+                }
+
+                if (!GenerateBIPToken())
+                {
+                    result.Success = false;
+                    result.Message = "Get XML Documents failed!";
+                    result.MessageDetail = "Internal security token generation failed";
+                    return result;
+                }
+
+                ProcessLogs.bipToken = bipToken;
+                ProcessLogs.logFilePath = logFilePath;
+                ProcessLogs.webApiUrl = bipAPIURL;
 
                 #region Get CargoWise XML Documents
                 using (SqlConnection conn = new SqlConnection(centralDBURL))
@@ -158,14 +313,109 @@ namespace XMLAPI.Controllers
                                 result.Success = true;
                                 result.Message = "Document successfully retrieved.";
                                 result.MessageDetail = "New CargoWise document was successfully retrieved.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
                             }
                             else
                             {
                                 result.Success = true;
                                 result.Message = "No documents available.";
                                 result.MessageDetail = "No new CargoWise XML documents available at this moment. Please try again later.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Warning, ActiveProfileID);
                             }
                         }
+
+                        #region BIP Message
+                        //we need to create a new message in BIP
+                        BaseMessage bmessage = new BaseMessage();
+                        List<MessageHistoryModel> newHistory = new List<MessageHistoryModel>();
+
+                        using (DataSet ds = new DataSet("XMLDocs"))
+                        {
+                            using (DataTable dt = new DataTable("XMLDocsGet"))
+                            {
+                                dt.Columns.Add("RequestedMessageID", typeof(string));
+                                dt.Columns.Add("RequestedType", typeof(string));
+                                dt.Columns.Add("ResultMsg", typeof(string));
+                                dt.Columns.Add("ResultDetailMsg", typeof(string));
+                                dt.AcceptChanges();
+
+                                DataRow dr = dt.NewRow();
+                                dr["RequestedMessageID"] = key;
+                                dr["RequestedType"] = type;
+                                dr["ResultMsg"] = result.Message;
+                                dr["ResultDetailMsg"] = result.MessageDetail;
+
+                                dt.Rows.Add(dr);
+                                dt.AcceptChanges();
+
+                                ds.Tables.Add(dt);
+                                ds.AcceptChanges();
+
+                                using (TextWriter write = new StringWriter())
+                                {
+                                    //convert the results into xml   
+                                    ds.WriteXml(write);
+                                    //also convert the xml into byte arry
+                                    bmessage.Context = new byte[write.ToString().Length * sizeof(char)];
+                                    System.Buffer.BlockCopy(write.ToString().ToCharArray(), 0, bmessage.Context, 0, bmessage.Context.Length);
+                                }
+                            }
+                        }
+
+                        if (result.Success)
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Processing;
+                            bmessage.MessageStatus = InternalStatus.Processing;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = "Request received from LandSea XML API Service - Get XML Documents",
+                                ProfileProcessID = ProfileProcessID,
+                                EventTypeID = (byte)EventLogType.Information,
+                                MessageStatusID = 1,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+                        else
+                        {
+                            bmessage.PublishMessageID = (int)InternalStatus.Suspended;
+                            bmessage.MessageStatus = InternalStatus.Suspended;
+                            newHistory.Add(new MessageHistoryModel
+                            {
+                                EventDesc = result.Message + " Detail: " + result.MessageDetail,
+                                ProfileProcessID = ProfileProcessID,
+                                EventTypeID = (byte)EventLogType.Error,
+                                MessageStatusID = 2,
+                                DoneBy = "LandSea API Service"
+                            });
+                        }
+
+                        bmessage.PromoteValue("RequestedMessageID", type);
+                        bmessage.PromoteValue("SentType", type);
+                        bmessage.webApiUrl = bipAPIURL;
+                        bmessage.bipToken = bipToken;
+                        bmessage.AttachmentID = 0;
+                        bmessage.XMLContext = string.Empty;
+                        bmessage.ProfileID = ActiveProfileID;
+                        bmessage.CreatedBy = "LandSea XML API Service";
+                        bmessage.ReProcessed = false;
+                        bmessage.PublishMessageID = null;
+                        bmessage.ProfileProcessID = ProfileProcessID;
+
+                        bool saveResult = true;
+                        using (UpdateMessage sMessage = new BIP.MessageUtils.UpdateMessage())
+                        {
+                            saveResult = sMessage.SaveMessageDetail(bmessage, newHistory, BIP.Enum.MessageType.Incomming, ref messageDetail);
+                        }
+
+                        if (!saveResult)
+                        {
+                            result.Success = false;
+                            result.Message = "Failed to Update BIP process";
+                            result.MessageDetail = messageDetail;
+                        }
+                        #endregion BIP Message
                     }
                     catch (Exception ex)
                     {
@@ -192,7 +442,7 @@ namespace XMLAPI.Controllers
 
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public RequestReponse SAPProcessed(int messageID)
+        public RequestReponse SAPProcessed([FromUri]int messageID)
         {
             RequestReponse result = new RequestReponse();
 
@@ -201,17 +451,38 @@ namespace XMLAPI.Controllers
                 // XML document result will be passed in here as a string
                 string messageDetail = string.Empty;
 
-                string centralDBURL = ConfigurationManager.AppSettings["LandseaCD"].ToString();
+                string centralDBURL = ConfigurationManager.ConnectionStrings["LandseaDB"].ToString();
 
-                if (string.IsNullOrEmpty(centralDBURL))
+
+                if (!LoadSettings())
                 {
                     result.Success = false;
-                    result.Message = "Landsea Global Central Database - internal configuration problem";
-                    result.MessageDetail = "Landsea Global - Landsea Global Central Database connection was not configured correctly.";
+                    result.Message = "XML Documents Update SAP Processed failed!";
+                    result.MessageDetail = "Failed to read configuration settings.";
                     return result;
                 }
 
-                #region Get CargoWise XML Documents
+                if (string.IsNullOrEmpty(messageID.ToString()))
+                {
+                    result.Success = false;
+                    result.Message = "XML Documents Update SAP Processed failed!";
+                    result.MessageDetail = "Message ID is missing.";
+                    return result;
+                }
+
+                if (!GenerateBIPToken())
+                {
+                    result.Success = false;
+                    result.Message = "XML Documents Update SAP Processed failed!";
+                    result.MessageDetail = "Internal security token generation failed";
+                    return result;
+                }
+
+                ProcessLogs.bipToken = bipToken;
+                ProcessLogs.logFilePath = logFilePath;
+                ProcessLogs.webApiUrl = bipAPIURL;
+
+                #region Set CargoWise XML as Processed by SAP
                 using (SqlConnection conn = new SqlConnection(centralDBURL))
                 {
                     if (conn.State != ConnectionState.Closed)
@@ -243,12 +514,16 @@ namespace XMLAPI.Controllers
                                 result.Success = true;
                                 result.Message = "SAP Message Processed flag successfully updated.";
                                 result.MessageDetail = "SAP Message Processed flag successfully updated.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Information, ActiveProfileID);
                             }
                             else
                             {
                                 result.Success = false;
                                 result.Message = "SAP Message Processed flag update failed.";
                                 result.MessageDetail = "SAP Message Processed flag update failed - please ensure the Message ID is correct.";
+
+                                ProcessLogs.UpdateProfileHistory(string.Join(" - ", result.Message, result.MessageDetail), BIP.Enum.EventLogType.Error, ActiveProfileID);
                             }
                         }
                     }
@@ -257,24 +532,81 @@ namespace XMLAPI.Controllers
                         result.Success = false;
                         result.Message = ex.Message;
                         result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
+
+                        ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
                     }
                     finally
                     {
                         conn.Close();
                     }
                 }
-                #endregion Get CargoWise XML Documents
+                #endregion Set CargoWise XML as Processed by SAP
             }
             catch (Exception ex)
             {
                 result.Success = false;
                 result.Message = ex.Message;
                 result.MessageDetail = ExceptionDetail.GetExceptionFullMessage(ex);
+
+                ProcessLogs.UpdateProfileHistory(result.Message, BIP.Enum.EventLogType.Error, ActiveProfileID);
             }
 
             return result;
         }
 
+        #region Private BIP settings
 
+        private bool LoadSettings()
+        {
+            try
+            {
+                bipAPIURL = ConfigurationManager.AppSettings["BIPApiURL"];
+                logFilePath = ConfigurationManager.AppSettings["LogFilePath"].ToString();
+
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["XMLDocsGet"]))
+                {
+                    ActiveProfileID = int.Parse(ConfigurationManager.AppSettings["XMLDocsGet"]);
+                }
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["XMLDocsSAPProcessedUpdate"]))
+                {
+                    ProfileProcessID = int.Parse(ConfigurationManager.AppSettings["XMLDocsSAPProcessedUpdate"]);
+                }
+            }
+            catch (Exception exp)
+            {
+                ProcessLogs.logFilePath = logFilePath;
+                ProcessLogs.writeToLogFile("Error Reading Settings:" + exp.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool GenerateBIPToken()
+        {
+            try
+            {
+                using (BSW.APIToken.Token t = new BSW.APIToken.Token())
+                {
+                    var result = t.GenerateToken("1", "Landsea-XMLAPIService", 10, "Landsea - XMLAPIService", "");
+                    if (result.Successful)
+                    {
+                        bipToken = result.UserToken;
+                    }
+                    else
+                    {
+                        bipToken = string.Empty;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ProcessLogs.logFilePath = logFilePath;
+                ProcessLogs.writeToLogFile("Generating BIP Token:" + ExceptionDetail.GetExceptionFullMessage(ex));
+                return false;
+            }
+            return true;
+        }
+        #endregion Private BIP settings
     }
 }

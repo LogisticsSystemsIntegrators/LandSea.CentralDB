@@ -296,9 +296,13 @@ namespace XMLAPI.Controllers
                 logFilePath = ConfigurationManager.AppSettings["LogFilePath"].ToString();
 
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["InvoicePamentUpdateProfileID"]))
+                {
                     ActiveProfileID = int.Parse(ConfigurationManager.AppSettings["InvoicePamentUpdateProfileID"]);
+                }
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["InvoicePaymentUpdateProcessID"]))
+                {
                     ProfileProcessID = int.Parse(ConfigurationManager.AppSettings["InvoicePaymentUpdateProcessID"]);
+                }
 
                 paymentURL = ConfigurationManager.AppSettings["CargoWisePaymentURL"];
                 paymentUser = ConfigurationManager.AppSettings["CargoWisePaymentUser"];

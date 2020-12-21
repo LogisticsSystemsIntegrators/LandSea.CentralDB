@@ -55,7 +55,7 @@
       <HintPath>..\BSW Components\BIP.DataModel.dll</HintPath>
     </Reference>
     <Reference Include="BIP.Enum">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\Integration Platform\V7\StandAlone Testing\Base Components\BIP.Enum.dll</HintPath>
+      <HintPath>..\..\..\..\BSW Components\BIP.Enum.dll</HintPath>
     </Reference>
     <Reference Include="BIP.MessageUtils">
       <HintPath>..\BSW Components\BIP.MessageUtils.dll</HintPath>
@@ -67,7 +67,7 @@
       <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIToken.dll</HintPath>
     </Reference>
     <Reference Include="BSW.Data.Provider">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\BSW\BSW.Data.Provider\bin\Release\BSW.Data.Provider.dll</HintPath>
+      <HintPath>..\..\..\..\BSW Components\BSW.Data.Provider.dll</HintPath>
     </Reference>
     <Reference Include="BSWCrypt">
       <HintPath>..\..\..\..\..\LPS\Projects\Development\LSI\Forte\TLCGOAPI\BSW Components\BSWCrypt.dll</HintPath>

@@ -37,7 +37,7 @@ namespace XMLAPI.Controllers
                 if (string.IsNullOrEmpty(etnDetail.CaroWiseKey))
                 {
                     result.Success = false;
-                    result.Message = "Update ETN Number Failed!";
+                    result.Message = "Update ETN Number failed!";
                     result.MessageDetail = "CargoWise Key value is missing";
                     return result;
                 }
@@ -45,7 +45,7 @@ namespace XMLAPI.Controllers
                 if(!LoadSettings())
                 {
                     result.Success = false;
-                    result.Message = "ETA Number Update Failed failed!";
+                    result.Message = "ETA Number Update failed!";
                     result.MessageDetail = "Failed to read configuration settings";
                     return result;
                 }
@@ -53,15 +53,14 @@ namespace XMLAPI.Controllers
                 if(!GenerateBIPToken())
                 {
                     result.Success = false;
-                    result.Message = "ETA Number Update Failed failed!";
+                    result.Message = "ETA Number Update failed!";
                     result.MessageDetail = "Internal security token generation failed";
                     return result;
                 }
 
                 ProcessLogs.bipToken = bipToken;
                 ProcessLogs.logFilePath = logFilePath;
-                ProcessLogs.webApiUrl = bipAPIURL;
-                
+                ProcessLogs.webApiUrl = bipAPIURL;                
 
                 using (CargoWiseFileProvider provider = new CargoWiseFileProvider())
                 {
@@ -79,7 +78,7 @@ namespace XMLAPI.Controllers
                     }
                 }
 
-
+                #region BIP Message
                 //we need to create a new message in BIP
                 BaseMessage bmessage = new BaseMessage();
                 List<MessageHistoryModel> newHistory = new List<MessageHistoryModel>();
@@ -116,8 +115,6 @@ namespace XMLAPI.Controllers
                             bmessage.Context = new byte[write.ToString().Length * sizeof(char)];
                             System.Buffer.BlockCopy(write.ToString().ToCharArray(), 0, bmessage.Context, 0, bmessage.Context.Length);
                         }
-
-
                     }
                 }
 
@@ -172,8 +169,7 @@ namespace XMLAPI.Controllers
                     result.Message = "Failed to Update BIP process";
                     result.MessageDetail = msg;
                 }
-
-
+                #endregion BIP Message
             }
             catch (Exception ex)
             {
@@ -187,7 +183,6 @@ namespace XMLAPI.Controllers
             return result;
         }
 
-
         #region - Private methods -
 
         private bool LoadSettings()
@@ -198,9 +193,13 @@ namespace XMLAPI.Controllers
                 logFilePath = ConfigurationManager.AppSettings["LogFilePath"].ToString();
 
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["ProfileIDETNNumberUpdate"]))
+                {
                     ActiveProfileID = int.Parse(ConfigurationManager.AppSettings["ProfileIDETNNumberUpdate"]);
+                }
                 if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["ProfileProcessIDETNNumberUpdate"]))
+                {
                     ProfileProcessID = int.Parse(ConfigurationManager.AppSettings["ProfileProcessIDETNNumberUpdate"]);
+                }
 
             }
             catch (Exception exp)
@@ -238,7 +237,6 @@ namespace XMLAPI.Controllers
             return true;
         }
 
-        #endregion
-
+        #endregion  
     }
 }
