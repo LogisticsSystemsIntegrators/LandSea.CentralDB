@@ -11,6 +11,7 @@
 -- 01	2020-12-08		Add Update to new extaction history table/ ETN refernece filed on xml
 -- 02   2020-12-09		Add new GIB Invoice number column as part of the update to the table
 -- 03   2020-12-10		Add the new Update and Customized Filed update to the XML file.
+-- 04   2021-02-19		Add new Consol check and path changes based on consol
 -- ====================================================================================
 Create PROCEDURE ETNNumberUpdate
 	@CargoWiseKey varchar(20),
@@ -71,133 +72,263 @@ BEGIN
 			Set @CustomFieldCount = 0;
 			Set @NodeCount = 0;
 
-			--we need the count of ChargeLines - to all SellRefence
-			Select
-				@NodeCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)','INT') 
-			From 
-				dbo.CargoWiseFile 
-			Where ID = @ActiveID;
-					
-			WHILE @NodeCount > 0
+			--check if this is a consol xml file  -if so then a different path is needed
+			IF EXISTS(Select * From dbo.CargoWiseFile Where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:DataContext/*:DataSourceCollection/*:DataSource)[1]/*:Type)[1]','varchar(50)') = 'ForwardingConsol')
 				Begin
-					--we need to delete nodes - if exists, we cannot update empty node values
-					Update CargoWiseFile
-						Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")]/*:SellReference)')
-					Where 
-						ID = @ActiveID;
-					---re-ad the new node with the updated value
-					Update dbo.CargoWiseFile
-						Set FileContext.modify('insert <SellReference>{sql:variable("@ETNNumber")}</SellReference> into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")])[1]')
-					Where 
-						ID = @ActiveID;
 					
-					Set @NodeCount = @NodeCount - 1
+					--we need the count of ChargeLines - to all SellRefence
+					Select
+						@NodeCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)','INT') 
+					From 
+						dbo.CargoWiseFile 
+					Where ID = @ActiveID;
+					
+					WHILE @NodeCount > 0
+						Begin
+							--we need to delete nodes - if exists, we cannot update empty node values
+							Update dbo.CargoWiseFile
+								Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")]/*:SellReference)')
+							Where 
+								ID = @ActiveID;
+							---re-ad the new node with the updated value
+							Update dbo.CargoWiseFile
+								Set FileContext.modify('insert <SellReference>{sql:variable("@ETNNumber")}</SellReference> into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")])[1]')
+							Where 
+								ID = @ActiveID;
+					
+							Set @NodeCount = @NodeCount - 1
 
-				End
+						End
 
-			--if no customeized collection exists - add the full new one
-			IF EXISTS(Select * From CargoWiseFile Where ID = @ActiveID And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection') = 0)
-				Begin
-					Update dbo.CargoWiseFile
-							Set FileContext.modify('insert 
-									<CustomizedFieldCollection>
-										<CustomizedField>
-											<DataType>String</DataType>
-											<Key>ETTN Number</Key>
-											<Value>{sql:variable("@ETNNumber")}</Value>
-										</CustomizedField>
-										<CustomizedField>
-											<DataType>String</DataType>
-											<Key>GIB Invoice Number</Key>
-											<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
-										</CustomizedField>
-									</CustomizedFieldCollection> 
-									into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment)[1]')
-						Where 
-							id = @ActiveID
-							And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection') = 0
+					--if no customeized collection exists - add the full new one
+					IF EXISTS(Select * From dbo.CargoWiseFile Where ID = @ActiveID And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection') = 0)
+						Begin
+							Update dbo.CargoWiseFile
+									Set FileContext.modify('insert 
+											<CustomizedFieldCollection>
+												<CustomizedField>
+													<DataType>String</DataType>
+													<Key>ETTN Number</Key>
+													<Value>{sql:variable("@ETNNumber")}</Value>
+												</CustomizedField>
+												<CustomizedField>
+													<DataType>String</DataType>
+													<Key>GIB Invoice Number</Key>
+													<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+												</CustomizedField>
+											</CustomizedFieldCollection> 
+											into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment)[1]')
+								Where 
+									id = @ActiveID
+									And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection') = 0
+						End
+					Else
+						Begin
+
+							--we need to check each Customzied Field child node
+							Select
+								@CustomFieldCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)','INT') 
+							From 
+								dbo.CargoWiseFile 
+							Where id = @ActiveID
+
+							while @CustomFieldCount > 0
+								Begin
+
+									if exists (select * from dbo.CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'ETTN Number')
+										begin
+											Set @HasETNNumber = 1;
+											--we need to delete the existing vlaue node, incase it's "empty" "empty" nodes cannot be updated
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
+											Where ID = @ActiveID
+								
+											--add the new node with it's value
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('insert <Value>{sql:variable("@ETNNumber")}</Value>
+														into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
+												Where 
+													id = @ActiveID
+		
+										End
+										--we do the same for the GIB invoice field
+									if exists (select * from dbo.CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'GIB Invoice Number')
+										begin
+											Set @HasGIBINvoice = 1;
+								
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
+											Where ID = @ActiveID
+								
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('insert <Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+														into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
+												Where 
+													id = @ActiveID
+										End
+									Set @CustomFieldCount = @CustomFieldCount - 1;
+								End
+		
+							If @HasETNNumber = 0 --value have not found - only other custom fields
+								Begin
+									Update dbo.CargoWiseFile
+										Set FileContext.modify('insert 
+													<CustomizedField>
+														<DataType>String</DataType>
+														<Key>ETTN Number</Key>
+														<Value>{sql:variable("@ETNNumber")}</Value>
+													</CustomizedField>
+												into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection)[1]')
+									Where 
+										id = @ActiveID
+								End
+		
+							if @HasGIBINvoice = 0
+								Begin
+									Update dbo.CargoWiseFile
+										Set FileContext.modify('insert 
+													<CustomizedField>
+														<DataType>String</DataType>
+														<Key>GIB Invoice Number</Key>
+														<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+													</CustomizedField>
+												into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:SubShipmentCollection/*:SubShipment/*:CustomizedFieldCollection)[1]')
+									Where 
+										id = @ActiveID
+						
+								End
+						End
+							
 				End
 			Else
 				Begin
 
-					--we need to check each Customzied Field child node
+					--we need the count of ChargeLines - to all SellRefence
 					Select
-						@CustomFieldCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)','INT') 
+						@NodeCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)','INT') 
 					From 
 						dbo.CargoWiseFile 
-					Where id = @ActiveID
-
-					while @CustomFieldCount > 0
+					Where ID = @ActiveID;
+					
+					WHILE @NodeCount > 0
 						Begin
+							--we need to delete nodes - if exists, we cannot update empty node values
+							Update CargoWiseFile
+								Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")]/*:SellReference)')
+							Where 
+								ID = @ActiveID;
+							---re-ad the new node with the updated value
+							Update dbo.CargoWiseFile
+								Set FileContext.modify('insert <SellReference>{sql:variable("@ETNNumber")}</SellReference> into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:JobCosting/*:ChargeLineCollection/*:ChargeLine)[sql:variable("@NodeCount")])[1]')
+							Where 
+								ID = @ActiveID;
+					
+							Set @NodeCount = @NodeCount - 1
 
-							if exists (select * from CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'ETTN Number')
-								begin
-									Set @HasETNNumber = 1;
-									--we need to delete the existing vlaue node, incase it's "empty" "empty" nodes cannot be updated
-									Update CargoWiseFile
-										Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
-									Where ID = @ActiveID
-								
-									--add the new node with it's value
-									Update dbo.CargoWiseFile
-										Set FileContext.modify('insert <Value>{sql:variable("@ETNNumber")}</Value>
-												into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
-										Where 
-											id = @ActiveID
-		
-								End
-								--we do the same for the GIB invoice field
-							if exists (select * from CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'GIB Invoice Number')
-								begin
-									Set @HasGIBINvoice = 1;
-								
-									Update CargoWiseFile
-										Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
-									Where ID = @ActiveID
-								
-									Update dbo.CargoWiseFile
-										Set FileContext.modify('insert <Value>{sql:variable("@GIBInvoiceNumber")}</Value>
-												into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
-										Where 
-											id = @ActiveID
-								End
-							Set @CustomFieldCount = @CustomFieldCount - 1;
 						End
-		
-					If @HasETNNumber = 0 --value have not found - only other custom fields
+
+					--if no customeized collection exists - add the full new one
+					IF EXISTS(Select * From CargoWiseFile Where ID = @ActiveID And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection') = 0)
 						Begin
 							Update dbo.CargoWiseFile
-								Set FileContext.modify('insert 
-											<CustomizedField>
-												<DataType>String</DataType>
-												<Key>ETTN Number</Key>
-												<Value>{sql:variable("@ETNNumber")}</Value>
-											</CustomizedField>
-										into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection)[1]')
-							Where 
-								id = @ActiveID
+									Set FileContext.modify('insert 
+											<CustomizedFieldCollection>
+												<CustomizedField>
+													<DataType>String</DataType>
+													<Key>ETTN Number</Key>
+													<Value>{sql:variable("@ETNNumber")}</Value>
+												</CustomizedField>
+												<CustomizedField>
+													<DataType>String</DataType>
+													<Key>GIB Invoice Number</Key>
+													<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+												</CustomizedField>
+											</CustomizedFieldCollection> 
+											into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment)[1]')
+								Where 
+									id = @ActiveID
+									And FileContext.exist('/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection') = 0
 						End
-		
-					if @HasGIBINvoice = 0
+					Else
 						Begin
-							Update dbo.CargoWiseFile
-								Set FileContext.modify('insert 
-											<CustomizedField>
-												<DataType>String</DataType>
-												<Key>GIB Invoice Number</Key>
-												<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
-											</CustomizedField>
-										into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection)[1]')
-							Where 
-								id = @ActiveID
+
+							--we need to check each Customzied Field child node
+							Select
+								@CustomFieldCount = FileContext.value('count(/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)','INT') 
+							From 
+								dbo.CargoWiseFile 
+							Where id = @ActiveID
+
+							while @CustomFieldCount > 0
+								Begin
+
+									if exists (select * from CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'ETTN Number')
+										begin
+											Set @HasETNNumber = 1;
+											--we need to delete the existing vlaue node, incase it's "empty" "empty" nodes cannot be updated
+											Update CargoWiseFile
+												Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
+											Where ID = @ActiveID
+								
+											--add the new node with it's value
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('insert <Value>{sql:variable("@ETNNumber")}</Value>
+														into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
+												Where 
+													id = @ActiveID
+		
+										End
+										--we do the same for the GIB invoice field
+									if exists (select * from CargoWiseFile where ID = @ActiveID And FileContext.value('((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Key)[1]','varchar(50)') = 'GIB Invoice Number')
+										begin
+											Set @HasGIBINvoice = 1;
+								
+											Update CargoWiseFile
+												Set FileContext.modify('delete ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")]/*:Value)')
+											Where ID = @ActiveID
+								
+											Update dbo.CargoWiseFile
+												Set FileContext.modify('insert <Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+														into ((/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection/*:CustomizedField)[sql:variable("@CustomFieldCount")])[1]')
+												Where 
+													id = @ActiveID
+										End
+									Set @CustomFieldCount = @CustomFieldCount - 1;
+								End
+		
+							If @HasETNNumber = 0 --value have not found - only other custom fields
+								Begin
+									Update dbo.CargoWiseFile
+										Set FileContext.modify('insert 
+													<CustomizedField>
+														<DataType>String</DataType>
+														<Key>ETTN Number</Key>
+														<Value>{sql:variable("@ETNNumber")}</Value>
+													</CustomizedField>
+												into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection)[1]')
+									Where 
+										id = @ActiveID
+								End
+		
+							if @HasGIBINvoice = 0
+								Begin
+									Update dbo.CargoWiseFile
+										Set FileContext.modify('insert 
+													<CustomizedField>
+														<DataType>String</DataType>
+														<Key>GIB Invoice Number</Key>
+														<Value>{sql:variable("@GIBInvoiceNumber")}</Value>
+													</CustomizedField>
+												into (/*:UniversalInterchange/*:Body/*:UniversalShipment/*:Shipment/*:CustomizedFieldCollection)[1]')
+									Where 
+										id = @ActiveID
 						
+								End
 						End
+					
 				End
-
 			Delete From #TempCargoFile Where FileID = @ActiveID;
-
 		End
-
 
 	Delete From dbo.FileExtractionHistory Where CargoWiseKey = @CargoWiseKey And ExtractionType = 'SF';
 
