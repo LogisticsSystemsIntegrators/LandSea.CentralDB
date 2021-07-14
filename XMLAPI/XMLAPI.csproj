@@ -55,22 +55,22 @@
       <HintPath>..\BSW Components\BIP.DataModel.dll</HintPath>
     </Reference>
     <Reference Include="BIP.Enum">
-      <HintPath>..\..\..\..\BSW Components\BIP.Enum.dll</HintPath>
+      <HintPath>..\..\..\BSW\BSW.Portal\BSW Components\BIP.Enum.dll</HintPath>
     </Reference>
     <Reference Include="BIP.MessageUtils">
       <HintPath>..\BSW Components\BIP.MessageUtils.dll</HintPath>
     </Reference>
     <Reference Include="BSW.APIResponse">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIResponse.dll</HintPath>
+      <HintPath>..\..\..\BSW\BSW.Portal\BSW Components\BSW.APIResponse.dll</HintPath>
     </Reference>
     <Reference Include="BSW.APIToken">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\GAC Laser\Portal\BSW Components\BSW.APIToken.dll</HintPath>
+      <HintPath>..\..\..\BSW\BSW.Portal\BSW Components\BSW.APIToken.dll</HintPath>
     </Reference>
     <Reference Include="BSW.Data.Provider">
-      <HintPath>..\..\..\..\BSW Components\BSW.Data.Provider.dll</HintPath>
+      <HintPath>..\..\..\BSW\BSW.Portal\BSW Components\BSW.Data.Provider.dll</HintPath>
     </Reference>
     <Reference Include="BSWCrypt">
-      <HintPath>..\..\..\..\..\LPS\Projects\Development\LSI\Forte\TLCGOAPI\BSW Components\BSWCrypt.dll</HintPath>
+      <HintPath>..\..\..\BSW\BSW.Portal\BSW Components\BSWCrypt.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -168,6 +168,8 @@
     </Compile>
     <Compile Include="Controllers\AccountingController.cs" />
     <Compile Include="Controllers\ETNNumberController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
+    <Compile Include="Controllers\SAPDataController.cs" />
     <Compile Include="Controllers\XMLDocumentsController.cs" />
     <Compile Include="DataAccess\Models\CargoWiseFileModel.cs" />
     <Compile Include="DataAccess\Models\ETNNumberModel.cs" />
@@ -220,6 +222,8 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Authentication\" />
+    <Folder Include="Views\Order\" />
+    <Folder Include="Views\SAPData\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
