@@ -5,18 +5,19 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using XMLAPI.DataAccess;
-using BSW.APIResponse;
 using System.Web.Http.Cors;
 using System.Configuration;
-using BIP.BaseAdapter;
-using BIP.MessageUtils;
 using System.Data;
 using System.IO;
-using BIP.DataModel;
-using BIP.Enum;
 using XMLAPI.CargoWisePaymentService;
 using System.Xml.Serialization;
 using System.Text;
+
+using BSW.APIResponse;
+using BIP.BaseAdapter;
+using BIP.DataModel;
+using BIP.Enum;
+using BIP.MessageUtils;
 
 namespace XMLAPI.Controllers
 {
@@ -33,7 +34,7 @@ namespace XMLAPI.Controllers
 
         [HttpPost]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public RequestReponse UpdateInvoicePaymentDetails([FromBody]string paymentDetails)
+        public RequestReponse UpdateInvoicePaymentDetails([FromBody] string paymentDetails)
         {
             RequestReponse result = new RequestReponse();
             try
@@ -286,7 +287,7 @@ namespace XMLAPI.Controllers
         }
 
 
-        #region - Private methods -
+        #region Private methods
 
         private bool LoadSettings()
         {
@@ -311,7 +312,7 @@ namespace XMLAPI.Controllers
             catch (Exception exp)
             {
                 ProcessLogs.logFilePath = logFilePath;
-                ProcessLogs.writeToLogFile("Error Reading Settings:" + exp.Message);
+                ProcessLogs.WriteToLogFile("Error Reading Settings:" + exp.Message);
                 return false;
             }
             return true;
@@ -337,12 +338,12 @@ namespace XMLAPI.Controllers
             catch (Exception ex)
             {
                 ProcessLogs.logFilePath = logFilePath;
-                ProcessLogs.writeToLogFile("Generating BIP Token:" + ExceptionDetail.GetExceptionFullMessage(ex));
+                ProcessLogs.WriteToLogFile("Generating BIP Token:" + ExceptionDetail.GetExceptionFullMessage(ex));
                 return false;
             }
             return true;
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

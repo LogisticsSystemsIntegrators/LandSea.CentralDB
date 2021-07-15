@@ -24,7 +24,7 @@ namespace Demo
             InitializeComponent();
         }
 
-        private string authToken, bipAuthURL, landSeaOrderURL, bipAPIURL;
+        private string authToken, bipAuthURL, landSeaOrderURL;
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -32,7 +32,6 @@ namespace Demo
 
             bipAuthURL = appSettingsReader.GetValue("BIPAuthURL", typeof(string)).ToString();
             landSeaOrderURL = appSettingsReader.GetValue("LandSeaOrderURL", typeof(string)).ToString();
-            bipAPIURL = appSettingsReader.GetValue("BIPAPIURL", typeof(string)).ToString();
 
             //Testing only
             txtUsername.Text = "LandseaAPIUser";
@@ -215,11 +214,11 @@ namespace Demo
 
                 using (HttpClient client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri(bipAPIURL);
+                    client.BaseAddress = new Uri(landSeaOrderURL);
 
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
                     client.DefaultRequestHeaders.Add("BIPASK", authToken);
-                    var res = client.PostAsJsonAsync("LandSeaOrder/", sendString).Result;
+                    var res = client.PostAsJsonAsync("ProcessXML/", sendString).Result;
 
                     if (res.IsSuccessStatusCode)
                     {
@@ -271,7 +270,7 @@ namespace Demo
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("BIPASK", authToken);
                     client.DefaultRequestHeaders.Add("BIPASK", authToken);
                     //HttpResponseMessage res = client.GetAsync("GetXMLDocs?key=" + key + "&type=" + type).Result;
-                    HttpResponseMessage res = client.GetAsync("GetXMLDocs?type=" + type).Result;
+                    HttpResponseMessage res = client.GetAsync("XMLDocuments/GetXMLDocs?type=" + type).Result;
 
                     if (res.IsSuccessStatusCode)
                     {

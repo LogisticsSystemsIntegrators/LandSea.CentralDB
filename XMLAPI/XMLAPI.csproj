@@ -168,6 +168,8 @@
     </Compile>
     <Compile Include="Controllers\AccountingController.cs" />
     <Compile Include="Controllers\ETNNumberController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
+    <Compile Include="Controllers\SAPDataController.cs" />
     <Compile Include="Controllers\XMLDocumentsController.cs" />
     <Compile Include="DataAccess\Models\CargoWiseFileModel.cs" />
     <Compile Include="DataAccess\Models\ETNNumberModel.cs" />

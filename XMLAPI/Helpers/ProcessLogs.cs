@@ -48,7 +48,7 @@ namespace XMLAPI
                         var res = client.PutAsJsonAsync("api/ProfileHistory/AddHistoryEntry/", lstevent).Result;
                         if (!res.IsSuccessStatusCode)
                         {
-                            writeToLogFile(res.Content.ReadAsStringAsync().Result);
+                            WriteToLogFile(res.Content.ReadAsStringAsync().Result);
                         }
                         else
                         {
@@ -56,7 +56,7 @@ namespace XMLAPI
                             RequestReponse presult = res.Content.ReadAsAsync<RequestReponse>().Result;
                             if (!presult.Success)
                             {
-                                writeToLogFile(presult.Message + " Detail: " + presult.MessageDetail);
+                                WriteToLogFile(presult.Message + " Detail: " + presult.MessageDetail);
                             }
                         }
 
@@ -98,7 +98,7 @@ namespace XMLAPI
                     var res = client.PutAsJsonAsync("api/EventLog/AddLogEntry/", lstevent).Result;
                     if (!res.IsSuccessStatusCode)
                     {
-                        writeToLogFile(res.Content.ReadAsStringAsync().Result);
+                        WriteToLogFile(res.Content.ReadAsStringAsync().Result);
                     }
                     else
                     {
@@ -106,18 +106,18 @@ namespace XMLAPI
                         RequestReponse result = res.Content.ReadAsAsync<RequestReponse>().Result;
                         if (!result.Success)
                         {
-                            writeToLogFile(result.Message + " Detail: " + result.MessageDetail);
+                            WriteToLogFile(result.Message + " Detail: " + result.MessageDetail);
                         }
                     }
                 }
             }
             catch (Exception exp)
             {
-                writeToLogFile(BSW.APIResponse.ExceptionDetail.GetExceptionFullMessage(exp));
+                WriteToLogFile(BSW.APIResponse.ExceptionDetail.GetExceptionFullMessage(exp));
             }
         }
 
-        public static void writeToLogFile(string logMessage)
+        public static void WriteToLogFile(string logMessage)
         {
            
             string strLogMessage = string.Empty;

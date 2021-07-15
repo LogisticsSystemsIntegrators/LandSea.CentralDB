@@ -668,7 +668,7 @@ namespace XMLAPI.Controllers
             catch (Exception exp)
             {
                 ProcessLogs.logFilePath = logFilePath;
-                ProcessLogs.writeToLogFile("Error Reading Settings:" + exp.Message);
+                ProcessLogs.WriteToLogFile("Error Reading Settings:" + exp.Message);
                 return false;
             }
 
@@ -695,7 +695,7 @@ namespace XMLAPI.Controllers
             catch (Exception ex)
             {
                 ProcessLogs.logFilePath = logFilePath;
-                ProcessLogs.writeToLogFile("Generating BIP Token:" + ExceptionDetail.GetExceptionFullMessage(ex));
+                ProcessLogs.WriteToLogFile("Generating BIP Token:" + ExceptionDetail.GetExceptionFullMessage(ex));
                 return false;
             }
             return true;
